@@ -1,0 +1,130 @@
+{{- if .Values.prometheusOperator.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.prometheusOperator.namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: etcd-client
+  namespace: {{ .Values.prometheusOperator.namespace }}
+data:
+  ca.crt: {{ .Values.etcd.ca.crt | b64enc |  quote }}
+  healthcheck-client.key: {{ .Values.etcd.healthcheckClient.key | b64enc | quote }}
+  healthcheck-client.crt: {{ .Values.etcd.healthcheckClient.crt | b64enc | quote }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-operator
+  namespace: {{ .Values.prometheusOperator.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.prometheusOperator.releaseName }}
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: prometheus-operator
+    version: 8.12.13
+  values:
+    prometheusOperator:
+      createCustomResource: false # https://github.com/helm/charts/tree/master/stable/prometheus-operator#helm-fails-to-create-crds
+    grafana:
+      rbac:
+        pspUseAppArmor: false
+      adminPassword: {{ .Values.prometheusOperator.grafana.adminPassword | quote }}
+      grafana.ini:
+        log:
+          level: debug
+        server:
+          domain: grafana.{{ .Values.hostedZone }}
+          root_url: https://grafana.{{ .Values.hostedZone }}/
+        auth.generic_oauth:
+          enabled: true
+          client_id: {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
+          client_secret: {{ .Values.prometheusOperator.grafana.oauth.clientSecret | quote }}
+          scopes: {{ printf "%s audience:server:client_id:%s" .Values.prometheusOperator.grafana.oauth.scopes .Values.dex.oauth.clientId | quote}}
+          auth_url: https://dex.{{ .Values.hostedZone }}/auth
+          token_url: http://{{ .Values.dex.releaseName }}.{{ .Values.dex.namespace }}.svc:32000/token
+          api_url:
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: letsencrypt
+        hosts:
+          - grafana.{{ .Values.hostedZone }}
+        path: /
+        tls:
+          - secretName: grafana-tls
+            hosts:
+              - grafana.{{ .Values.hostedZone }}
+      persistence:
+        enabled: true
+        type: pvc
+      additionalDataSources:
+        - name: loki
+          type: loki
+          access: proxy
+          url: http://loki.{{ .Values.lokiStack.namespace }}.svc:3100
+          jsonData:
+            maxLines: 1000
+
+    alertmanager:
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: letsencrypt
+          nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
+        hosts:
+          - alertmanager.{{ .Values.hostedZone }}
+        paths:
+          - /
+        tls:
+          - secretName: alertmanager-tls
+            hosts:
+              - alertmanager.{{ .Values.hostedZone }}
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 20Gi
+    prometheus:
+      prometheusSpec:
+        secrets:
+          - etcd-client
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 20Gi
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: letsencrypt
+          nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
+        hosts:
+          - prometheus.{{ .Values.hostedZone }}
+        paths:
+          - /
+        tls:
+          - secretName: prometheus-tls
+            hosts:
+              - prometheus.{{ .Values.hostedZone }}
+    kubeEtcd:
+      serviceMonitor:
+        scheme: https
+        insecureSkipVerify: true
+        caFile: /etc/prometheus/secrets/etcd-client/ca.crt
+        certFile: /etc/prometheus/secrets/etcd-client/healthcheck-client.crt
+        keyFile: /etc/prometheus/secrets/etcd-client/healthcheck-client.key
+
+{{- end }}

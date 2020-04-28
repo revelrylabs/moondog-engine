@@ -1,0 +1,53 @@
+{{- if .Values.navigator.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.navigator.namespace }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: moondog-navigator
+  namespace: {{ .Values.navigator.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.navigator.releaseName }}
+  chart:
+    repository: https://revelrylabs.github.io/helm-charts
+    name: moondog-navigator
+    version: 0.0.4
+  values:
+    appDomain: navigator.{{ .Values.hostedZone }}
+    {{- with .Values.navigator.image }}
+    image:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.navigator.imagePullSecret }}
+    imagePullSecret:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    clusters:
+      - name: {{ .Values.navigator.clusterName }}
+        api:
+          url: https://kubernetes.default.svc
+          oidcClientId: {{ .Values.dex.oauth.clientId | quote }}
+        caCertUrl: {{ .Values.navigator.caCertUrl | quote }}
+        oidc:
+          authUrl: https://dex.{{ .Values.hostedZone }}/auth
+          tokenUrl: http://{{ .Values.dex.releaseName }}.{{ .Values.dex.namespace }}.svc:32000/token
+          clientId: {{ .Values.navigator.oauth.clientId | quote }}
+          clientSecret: {{ .Values.navigator.oauth.clientSecret | quote }}
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+        - host: navigator.{{ .Values.hostedZone }}
+          paths: ["/"]
+      tls:
+        - secretName: moondog-navigator-cert
+          hosts:
+            - navigator.{{ .Values.hostedZone }}
+{{- end }}

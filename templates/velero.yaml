@@ -1,0 +1,70 @@
+{{- if .Values.velero.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.velero.namespace }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: {{ .Values.velero.releaseName }}
+  namespace: {{ .Values.velero.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.velero.releaseName }}
+  chart:
+    repository: https://vmware-tanzu.github.io/helm-charts
+    name: velero
+    version: 2.9.1
+  values:
+    initContainers:
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.0.1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+    configuration:
+      provider: aws
+      backupStorageLocation:
+        name: aws
+        bucket: {{ .Values.velero.bucketName }}
+        config: 
+          region: {{ .Values.velero.region }}
+      volumeSnapshotLocation: 
+        name: aws
+        config: 
+          region: {{ .Values.velero.region }}
+    credentials: 
+      existingSecret: velero-aws-credentials 
+    schedules: 
+      hourly:
+        schedule: "0 */3 * * *"
+        template:
+          ttl: "24h0m0s"
+          includedNamespaces:
+          - '*'
+      daily:
+        schedule: "0 0 * * *"
+        template:
+          ttl: "168h0m0s"
+          includedNamespaces:
+          - '*'
+      monthly:
+        schedule: "0 1 1 * *"
+        template:
+          ttl: "4320h0m0s"
+          includedNamespaces:
+          - '*'
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: velero-aws-credentials
+  namespace: {{ .Values.velero.namespace }}
+type: Opaque
+data:
+  cloud: {{ .Values.velero.awsCredentials }}
+
+{{- end }}

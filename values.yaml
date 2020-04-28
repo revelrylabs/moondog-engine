@@ -1,0 +1,150 @@
+clusterName: foo
+apiServerUrl: https://api.example.com
+hostedZone: "example.com"
+helmReleaseTimeout: 1600
+ca: {}
+#   crt: "set via cli"
+#   key: "set via cli"
+github:
+  organization: "your org"
+  teams:
+    - "a github team in your org"
+    - "another github team in your org"
+  oauth:
+    {}
+    # clientId: "your oauth client id"
+    # clientSecret: "your oauth client secret"
+
+aws:
+  region: us-east-1
+  ebsVolumeTypes:
+    - type: gp2
+      isDefaultClass: "true"
+    - type: io1
+      isDefaultClass: "false"
+    - type: st1
+      isDefaultClass: "false"
+    - type: sc1
+      isDefaultClass: "false"
+
+certManager:
+  create: true
+  fake: false
+  replicaCount: 1
+  releaseName: md-cert-manager
+  namespace: md-cert-manager
+  # email: me@example.com
+
+dex:
+  create: true
+  releaseName: md-dex
+  namespace: md-dex
+  port: 32000
+  oauth:
+    clientId: dex
+    # clientSecret: "arbitrary client secret"
+
+flux:
+  create: true
+  releaseName: md-flux
+  namespace: md-flux
+  envSecretName: flux-git-deploy
+  git:
+    # repo: foo/bar
+    auth: {}
+    # key: git deploy key
+    repo: ssh://git@github.com/$(GIT_REPO)
+
+gangway:
+  create: true
+  releaseName: md-gangway
+  namespace: md-gangway
+  oauth:
+    clientId: gangway
+    scopes: openid profile email offline_access groups
+    # clientSecret
+
+harbor:
+  create: true
+  releaseName: md-harbor
+  namespace: md-harbor
+  postgres:
+    user: md_harbor
+  persistence:
+    imageChartStorage: {}
+#  we use S3 but this can be defined as any type you like per the harbor chart here:
+#  https://github.com/goharbor/harbor-helm/blob/55598b1f1ccba2bc1c12e94a2622840cae148eb8/values.yaml#L165
+
+kubedb:
+  create: true
+  releaseName: md-kubedb
+  namespace: md-kubedb
+  catalog:
+    releaseName: md-kubedb-catalog
+
+navigator:
+  create: false
+  releaseName: md-navigator
+  namespace: md-navigator
+  image:
+    repository: harbor.example.com/library/cluster-ui
+    tag: master
+  imagePullSecret:
+    create:
+      registry: harbor.example.com
+      username: "your harbor username"
+      password: "your harbor password"
+  clusterName: production
+  caCertUrl: https://example.com/certificate.crt
+  oauth:
+    clientId: moondog-navigator
+    # clientSecret: "arbitrary client secret"
+
+nginxIngress:
+  create: true
+  releaseName: md-nginx-ingress
+  namespace: md-nginx-ingress
+
+lokiStack:
+  create: true
+  releaseName: md-loki-stack
+  namespace: md-loki-stack
+  dockerHostPath: /var/lib/docker/containers
+  podsHostPath: /var/log/pods
+
+oauth2Proxy:
+  create: true
+  releaseName: md-oauth2-proxy
+  namespace: md-oauth2-proxy
+  oauth:
+    clientId: oauth2-proxy
+    # clientSecret: "arbitrary client secret"
+
+prometheusOperator:
+  create: true
+  releaseName: md-prometheus-operator
+  namespace: md-prometheus-operator
+  grafana:
+    # adminPassword: "your admin password"
+    oauth:
+      clientId: grafana
+      # clientSecret: "arbitrary client secret"
+      scopes: openid profile email offline_access groups
+
+sealedSecrets:
+  create: true
+  releaseName: sealed-secrets-controller
+  namespace: kube-system
+
+velero:
+  create: true
+  releaseName: md-velero
+  namespace: md-velero
+
+etcd:
+  ca: {}
+  # crt: "set via CLI"
+  healthcheckClient:
+    {}
+    # crt: "set via CLI"
+    # key: "set via in CLI"

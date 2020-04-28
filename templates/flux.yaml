@@ -1,0 +1,34 @@
+{{- if .Values.flux.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.flux.namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.flux.envSecretName }}
+  namespace: {{ .Values.flux.namespace }}
+data:
+  identity: {{ .Values.flux.git.auth.key }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: flux
+  namespace: {{ .Values.flux.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.flux.releaseName }}
+  chart:
+    repository: https://charts.fluxcd.io/
+    name: flux
+    version: 1.3.0
+  values:
+    git:
+      url: {{ .Values.flux.git.repo | quote }}
+      branch: {{ .Values.flux.git.branch }}
+      secretName: {{ .Values.flux.envSecretName }}
+
+{{- end }}

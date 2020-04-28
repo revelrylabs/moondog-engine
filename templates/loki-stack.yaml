@@ -1,0 +1,39 @@
+{{- if .Values.lokiStack.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.lokiStack.namespace }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: loki-stack
+  namespace: {{ .Values.lokiStack.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.lokiStack.releaseName }}
+  chart:
+    repository: https://grafana.github.io/loki/charts
+    name: loki-stack
+    version: 0.33.1
+  values:
+    loki:
+    promtail:
+      loki:
+      volumes:
+        - name: docker
+          hostPath:
+            path: {{ .Values.lokiStack.dockerHostPath | quote }}
+        - name: pods
+          hostPath:
+            path: {{ .Values.lokiStack.podsHostPath | quote }}
+      volumeMounts:
+        - name: docker
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: pods
+          mountPath: /var/log/pods
+          readOnly: true
+
+{{- end }}

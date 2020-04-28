@@ -1,0 +1,192 @@
+{{- if .Values.dex.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.dex.namespace }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: dex
+  namespace: {{ .Values.dex.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.dex.releaseName }}
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: dex
+    version: 2.5.0
+  values:
+    grpc: false
+    ports:
+      web:
+        nodePort: {{ .Values.dex.port }}
+        servicePort: {{ .Values.dex.port }}
+    config:
+      issuer: https://dex.{{ .Values.hostedZone }}
+      connectors:
+        {{- if .Values.github }}
+        - type: github
+          id: github
+          name: GitHub
+          config:
+            clientID: {{ .Values.github.oauth.clientId }}
+            clientSecret: {{ .Values.github.oauth.clientSecret }}
+            redirectURI: https://dex.{{ .Values.hostedZone }}/callback
+            orgs:
+            - name: {{ .Values.github.organization }}
+              teams:
+                {{- range .Values.github.teams }}
+                - {{ . }}
+                {{- end }}
+        {{- end}}
+      staticClients:
+        - id: {{ .Values.dex.oauth.clientId | quote }}
+          name: {{ .Values.dex.oauth.clientId | quote }}
+          secret: {{ .Values.dex.oauth.clientSecret | quote }}
+          redirectURIs:
+          - https://gangway.{{ .Values.hostedZone }}/callback
+          trustedPeers:
+            - {{ .Values.navigator.oauth.clientId | quote }}
+            - {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
+            - {{ .Values.oauth2Proxy.oauth.clientId | quote }}
+        - id: {{ .Values.navigator.oauth.clientId | quote }}
+          name: {{ .Values.navigator.oauth.clientId | quote }}
+          secret: {{ .Values.navigator.oauth.clientSecret | quote }}
+          redirectURIs:
+            - https://navigator.{{ .Values.hostedZone }}/kubernetes/auth/callback
+        - id: {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
+          name: {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
+          secret: {{ .Values.prometheusOperator.grafana.oauth.clientSecret | quote }}
+          redirectURIs:
+            - https://grafana.{{ .Values.hostedZone }}/login/generic_oauth
+        - id: {{ .Values.oauth2Proxy.oauth.clientId | quote }}
+          name: {{ .Values.oauth2Proxy.oauth.clientId | quote }}
+          secret: {{ .Values.oauth2Proxy.oauth.clientSecret | quote }}
+          redirectURIs:
+            - https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/callback
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+        - dex.{{ .Values.hostedZone }}
+      tls:
+        - secretName: dex-tls
+          hosts:
+            - dex.{{ .Values.hostedZone }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: clusterwide-admin
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dex-cluster-auth-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: clusterwide-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ .Values.github.organization }}:{{ .Values.dex.admin_team}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-read-all
+rules:
+- apiGroups:
+  - ""
+  - apps
+  - autoscaling
+  - batch
+  - extensions
+  - policy
+  - rbac.authorization.k8s.io
+  - storage.k8s.io
+  resources:
+  - componentstatuses
+  - configmaps
+  - cronjobs
+  - daemonsets
+  - deployments
+  - events
+  - endpoints
+  - horizontalpodautoscalers
+  - ingress
+  - ingresses
+  - jobs
+  - limitranges
+  - namespaces
+  - nodes
+  - pods
+  - pods/log
+  - pods/exec
+  - persistentvolumes
+  - persistentvolumeclaims
+  - resourcequotas
+  - replicasets
+  - replicationcontrollers
+  - serviceaccounts
+  - services
+  - services/proxy
+  - statefulsets
+  - storageclasses
+  - clusterroles
+  - roles
+  verbs:
+  - get
+  - watch
+  - list
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dex-cluster-auth
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-read-all
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ .Values.github.organization }}:{{ .Values.dex.readonly_team}}
+
+{{- end }}

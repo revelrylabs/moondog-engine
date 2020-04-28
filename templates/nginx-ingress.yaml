@@ -1,0 +1,32 @@
+{{- if .Values.nginxIngress.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.nginxIngress.namespace }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: nginx-ingress
+  namespace: {{ .Values.nginxIngress.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.nginxIngress.releaseName }}
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: nginx-ingress
+    version: 1.28.2
+  values:
+    podSecurityPolicy:
+      enabled: true
+    controller:
+      kind: DaemonSet
+      service:
+        annotations:
+          # Ensure the ELB idle timeout is less than nginx keep-alive timeout. By default,
+          # NGINX keep-alive is set to 75s. If using WebSockets, the value will need to be
+          # increased to '3600' to avoid any potential issues.
+          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "60"
+
+{{- end }}

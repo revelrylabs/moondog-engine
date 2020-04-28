@@ -1,0 +1,41 @@
+{{- if .Values.kubedb.create }}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.kubedb.namespace }}
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: kubedb
+  namespace: {{ .Values.kubedb.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.kubedb.releaseName }}
+  chart:
+    repository: https://charts.appscode.com/stable/
+    name: kubedb
+    version: v0.12.0
+  values:
+    apiserver:
+      healthcheck:
+        enabled: false 
+    enableAnalytics: false
+---
+
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: kubedb-catalog
+  namespace: {{ .Values.kubedb.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.kubedb.catalog.releaseName }}
+  chart:
+    repository: https://charts.appscode.com/stable/
+    name: kubedb-catalog
+    version: v0.12.0
+  values: {}
+
+{{- end }}

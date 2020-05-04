@@ -1,21 +1,52 @@
 #!/bin/sh -e
 
-### Stage 1 - Prerequisites
+### SETUP
 
-# constants for helm_operator
+# constants for helm-operator
 helm_operator_version=1.0.0
 helm_operator_namespace=md-helm-operator
 helm_operator_replica_count=1
 helm_versions=v3
 
-# CERT-MANAGER CRDs
+# build the --set-files flag for helm
+
+values_from_files=""
+function setfile() {
+  if [ -z "$values_from_files" ]
+  then
+    values_from_files=$1
+  else
+    values_from_files="$values_from_files,$1"
+  fi
+}
+
+setfile ca.crt=config/pki/ca.crt
+setfile etcd.ca.crt=config/pki/etcd/ca.crt
+setfile etcd.healthcheckClient.crt=config/pki/etcd/healthcheck-client.crt
+setfile etcd.healthcheckClient.key=config/pki/etcd/healthcheck-client.key
+
+### GENERATE THE TEMPLATE OUTPUTS
+
+# create tmp directory if it does not exist
+mkdir -p tmp 
+
+# template out the chart 
+helm template . \
+  --set-file $values_from_files \
+  -f config/values.yaml \
+  --output-dir tmp
+
+### INSTALL PREREQUISITES
+
+# Install cert-manager CRDs
+
 kubectl apply \
   --wait \
   -o yaml \
   --validate=false \
   -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml
 
-# INSTALL FLUX HELM-OPERATOR
+# Install helm-operator
 
 kubectl create namespace $helm_operator_namespace || echo "skip"
 helm repo add fluxcd https://charts.fluxcd.io
@@ -29,15 +60,7 @@ helm install md-helm-operator fluxcd/helm-operator \
   --set replicaCount=$helm_operator_replica_count \
   || echo "skip"
 
-### Stage 2 - GENERATE MOONDOG ENGINE METACHART TEMPLATE OUTPUTS
-
-# create tmp directory if it does not exist
-mkdir -p tmp 
-
-# template out the chart 
-helm template .  -f config/values.yaml --output-dir tmp 
-
-### Stage 3 - DEPLOY STAGE
+### APPLY THE TEMPLATE OUTPUTS
 
 # first deploy kubedb because its needed for harbor to install properly
 kubectl apply -f tmp/moondog/templates/kubedb.yaml
@@ -64,7 +87,7 @@ done
 # store rendered template filenames in a variable
 TEMPLATES=tmp/moondog/templates/*.yaml
 
-# APPLY RENDERED YAML TEMPLATES
+# apply all rendered templates
 for f in $TEMPLATES
 do
   echo "Processing $f template..."

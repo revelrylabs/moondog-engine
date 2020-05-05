@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.userPermissions.namespace | quote }}
+---
+
+{{ $groups := dict }}
+{{- range .Values.auth }}
+  {{- if eq .type "github" }}
+    {{- range .orgs }}
+      {{ $org := .name }}
+      {{- range .teams }}
+        {{ $group := printf "%s:%s" $org .name }}
+        {{ $groups = set $groups $group .permissions }}
+      {{- end }}
+    {{- end }}
+  {{- else if eq .type "google" }}
+    {{- range .hostedDomains }}
+      {{ $domain := .name }}
+      {{- range .groups }}
+        {{ $group := printf "%s@%s" .name $domain }}
+        {{ $groups = set $groups $group .permissions }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: user-permissions
+  namespace: {{ .Values.userPermissions.namespace | quote }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.certManager.releaseName }}
+  chart:
+    repository: https://revelrylabs.github.io/helm-charts
+    name: user-permissions
+    version: 0.1.0
+  values:
+    roleDefinitions: {{ .Values.userPermissions.roleDefinitions | toYaml | nindent 6 }}
+    {{- if $groups }}
+    bindings:
+    {{- range $name, $permissions := $groups }}
+    - group: {{ $name | quote }}
+      bindTo: {{ $permissions | toYaml | nindent 6 }}
+    {{- end }}
+    {{- end }}

@@ -27,6 +27,9 @@ spec:
         annotations:
           kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: letsencrypt
+      tls:
+        notarySecretName: tls-harbor-notary-ingress
+        secretName: tls-harbor-ingress
     externalURL: https://harbor.{{ .Values.hostedZone }}
     persistence:
     {{- with .Values.harbor.persistence.imageChartStorage}}
@@ -59,7 +62,7 @@ spec:
     repository: https://dandydeveloper.github.io/charts
     name: redis-ha
     version: 4.5.3
-  values: 
+  values:
     haproxy:
       enabled: true
 

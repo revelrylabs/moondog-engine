@@ -12,27 +12,37 @@ helm_versions=v3
 
 values_from_files=""
 function setfile() {
-  if [ -z "$values_from_files" ]
+  if [ -f "$2" ]
   then
-    values_from_files=$1
-  else
-    values_from_files="$values_from_files,$1"
+    if [ -z "$values_from_files" ]
+    then
+      values_from_files="$1=$2"
+    else
+      values_from_files="$values_from_files,$1=$2"
+    fi
   fi
 }
 
-setfile ca.crt=config/pki/ca.crt
-setfile etcd.ca.crt=config/pki/etcd/ca.crt
-setfile etcd.healthcheckClient.crt=config/pki/etcd/healthcheck-client.crt
-setfile etcd.healthcheckClient.key=config/pki/etcd/healthcheck-client.key
+setfile ca.crt config/pki/ca.crt
+setfile etcd.ca.crt config/pki/etcd/ca.crt
+setfile etcd.healthcheckClient.crt config/pki/etcd/healthcheck-client.crt
+setfile etcd.healthcheckClient.key config/pki/etcd/healthcheck-client.key
+
+if [ -n "$values_from_files" ]
+then
+  setfile_arg="--set-file $values_from_files"
+else
+  setfile_arg=""
+fi
 
 ### GENERATE THE TEMPLATE OUTPUTS
 
 # create tmp directory if it does not exist
-mkdir -p tmp 
+mkdir -p tmp
 
-# template out the chart 
+# template out the chart
 helm template . \
-  --set-file $values_from_files \
+  $setfile_arg \
   -f config/values.yaml \
   --output-dir tmp
 
@@ -77,7 +87,7 @@ done
 
 echo "ensuring kubedb CRDs exist..."
 
-# ensure postgres crd exists 
+# ensure postgres crd exists
 until kubectl get crd postgreses.kubedb.com
 do
     echo ...
@@ -91,7 +101,7 @@ TEMPLATES=tmp/moondog/templates/*.yaml
 for f in $TEMPLATES
 do
   echo "Processing $f template..."
-  kubectl apply --wait -f $f 
+  kubectl apply --wait -f $f
 done
 
 echo "Install is complete!"

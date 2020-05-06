@@ -29,9 +29,9 @@ Install Helm if you do not already have it: https://helm.sh/docs/intro/install/
 
 ### Amazon S3
 
-* Create an S3 bucket that Moondog Engine apps will use for storing backups. https://docs.aws.amazon.com/quickstarts/latest/s3backup/step-1-create-bucket.html
-* Create an S3 bucket that Moondog Engine apps will use for storing Database backups.
-* Create an IAM credentials that can write to each S3 bucket you created above. https://aws.amazon.com/premiumsupport/knowledge-center/create-access-key/
+* [Create an Amazon S3 bucket](https://docs.aws.amazon.com/quickstarts/latest/s3backup/step-1-create-bucket.html) that Moondog Engine apps will use for storing backups of Kubernetes resources and volumes.
+* [Create an Amazon S3 bucket](https://docs.aws.amazon.com/quickstarts/latest/s3backup/step-1-create-bucket.html) that Moondog Engine apps will use for storing backups of KubeDB databases.
+* [Create IAM credentials](https://aws.amazon.com/premiumsupport/knowledge-center/create-access-key/) that can write to each S3 bucket you created above.
 
 ### GitHub repo for git-ops
 
@@ -70,18 +70,16 @@ config/
 
 ## Configuring `config/pki` files
 
-You will need to download some files from your Kubernetes masters and put them in their respective directories in ./config
+You will need to download some files from your Kubernetes masters and put them in their respective directories in `./config/pki`.
 
-If you used kubeadm, more information is here: 
-
-https://kubernetes.io/docs/setup/best-practices/certificates/#where-certificates-are-stored
+If you used kubeadm, more information is here: https://kubernetes.io/docs/setup/best-practices/certificates/#where-certificates-are-stored
 
 
 ## Configuring `config/values.yaml`
 
-For the most part, you should be able to open and edit the provided starter `config/values.yaml` file, following the instructions and comments contained therein.
+For the most part, you should be able to copy `values.yaml` to `config/values.yaml` and then edit it, following the instructions and comments contained therein.
 
-For a detailed description of some of the configuration keys and their meanings, see [the full table of configuration parameters](#configuration-parameters).
+For a more detailed description and usage guide for each configuration section, refer to [the full docs](https://github.com/revelrylabs/moondog-engine/tree/master/docs).
 
 ## Installing
 
@@ -105,7 +103,15 @@ md-nginx-ingress-controller        LoadBalancer   10.96.228.202   somelongdns.us
 
 Then, for example, in your DNS create a CNAME for `*.foo.example.com` to `somelongdns.us-east-1.elb.amazonaws.com`
 
-This will allow traffic to reach the cluster and complete the installation process. At this point, certificates should begin to solve via `cert-manager`. Wait a bit and then check if you can reach 
+This will allow traffic to reach the cluster and complete the installation process. At this point, certificates should begin to solve via `cert-manager`. Wait a bit and then check if you can reach one of the web apps.
+
+## Uninstalling
+
+To delete everything that Moondog Engine installed and start over:
+
+```
+./uninstall.sh
+```
 
 ## Troubleshooting
 
@@ -115,82 +121,4 @@ Hopefully the installer will exit with a helpful error. If not, the line it exit
 
 If any of the components appear to be missing, you can describe the helmrelease to try to see what went wrong with its installation. Failing that, you can look at the logs of pods in the individual namespaces the installer creates for each helmrelease. 
 
-If all else fails feel free to open an issue and we will try to help you!
-
-## Configuration Parameters
-
-
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
-| `clusterName` |  |  |
-| `apiServerUrl` | URL of Kubernetes API service |  |
-| `hostedZone` | Base domain for ingresses. For example, if the `hostedZone` is "example.com", Dex will be exposed at `dex.example.com` |  |
-| `helmReleaseTimeout` | How long `helm-operator` will wait before giving up on installing a `HelmRelease` |  |
-| `github.organization` | Cluster auth via Dex will be restricted to members of this GitHub organization |  |
-| `github.teams` | Cluster auth via Dex will be restricted to members of these teams in your GitHub organization |  |
-| `github.oauth.clientId` | The OAuth client ID for your GitHub OAuth app |  |
-| `github.oauth.clientSecret` | The OAuth client secret for your GitHub OAuth app |  |
-| `github.ebsVolumeTypes` | For each of these, one `StorageClass` will be created in the cluster. |  |
-| `certManager.create` | Whether or not to install `cert-manager` |  |
-| `certManager.replicaCount` | The number of replicas for the `cert-manager` deployment |  |
-| `certManager.releaseName` | The Helm release name for `cert-manager` | `"md-cert-manager"` |
-| `certManager.namespace` | The namespace to install `cert-manager` into | `"md-cert-manager"` |
-| `dex.create` | Whether or not to install `dex` |  |
-| `dex.releaseName` | The Helm release name for `dex` | `"md-dex"` |
-| `dex.namespace` | The namespace to install `dex` into | `"md-dex"` |
-| `dex.oauth.clientId` | The client ID for the primary OIDC client (this needs to match your Kubernetes API's `--oidc-client-id` flag) | `"dex"` |
-| `dex.oauth.clientSecret` | An arbitrary strong secret string |  |
-| `flux.create` | Whether or not to install `flux` |  |
-| `flux.releaseName` | The Helm release name for `flux` | `"md-flux"` |
-| `flux.namespace` | The namespace to install `flux` into | `"md-flux"` |
-| `flux.envSecretName` | The name of the `Secret` to store environment variables for `flux` |  |
-| `flux.git.repo` | The URL of the git repository to be used for `flux` git ops |  |
-| `flux.git.auth` | The credentials for authenticating to `flux.git.repo` |  |
-| `gangway.create` | Whether or not to install `gangway` |  |
-| `gangway.releaseName` | The Helm release name for `gangway` | `"md-gangway"` |
-| `gangway.namespace` | The namespace to install `gangway` into | `"md-gangway"` |
-| `harbor.create` | Whether or not to install `harbor` |  |
-| `harbor.releaseName` | The Helm release name for `harbor` | `"md-harbor"` |
-| `harbor.namespace` | The namespace to install `harbor` into | `"md-harbor"` |
-| `harbor.persistence` | Allows override for the `harbor` Helm chart's parameter of the same name | (See https://helm.goharbor.io) |
-| `harbor.postgres.user` | The name of the user to create and use with the included PostgreSQL instance | `"md_harbor"` |
-| `harbor.postgres.password` | The password for the user to create and use with the included PostgreSQL instance |  |
-| `kubedb.create` | Whether or not to install `kubedb` and `kubedb-catalog` |  |
-| `kubedb.releaseName` | The Helm release name for `kubedb` | `"md-kubedb"` |
-| `kubedb.namespace` | The namespace to install `kubedb` and `kubedb-catalog` into | `"md-kubedb"` |
-| `kubedb.catalog.releaseName` | The Helm release name for `kubedb-catalog` | `"md-kubedb-catalog"` |
-| `nginxIngress.create` | Whether or not to install `nginx-ingress` |  |
-| `nginxIngress.releaseName` | The Helm release name for `nginx-ingress` | `"md-nginx-ingress"` |
-| `nginxIngress.namespace` | The namespace to install `nginx-ingress` into | `"md-nginx-ingress"` |
-| `lokiStack.create` | Whether or not to install `loki-stack` |  |
-| `lokiStack.releaseName` | The Helm release name for `loki-stack` | `"md-loki-stack"` |
-| `lokiStack.namespace` | The namespace to install `loki-stack` into | `"md-loki-stack"` |
-| `lokiStack.dockerHostPath` |  | `/var/lib/docker/containers` |
-| `lokiStack.podsHostPath` |  | `/var/log/pods` |
-| `oauth2Proxy.create` | Whether or not to install `oauth2-proxy` |  |
-| `oauth2Proxy.releaseName` | The Helm release name for `oauth2-proxy` | `"md-oauth2-proxy"` |
-| `oauth2Proxy.namespace` | The namespace to install `oauth2-proxy` into | `"md-oauth2-proxy"` |
-| `oauth2Proxy.oauth.clientId` |  | `"oauth2-proxy"` |
-| `oauth2Proxy.oauth.clientSecret` |  |  |
-| `prometheusOperator.create` | Whether or not to install `prometheus-operator` |  |
-| `prometheusOperator.releaseName` | The Helm release name for `prometheus-operator` | `"md-prometheus-operator"` |
-| `prometheusOperator.namespace` | The namespace to install `prometheus-operator` into | `"md-prometheus-operator"` |
-| `prometheusOperator.grafana.oauth.clientId` |  | `"grafana"` |
-| `prometheusOperator.grafana.oauth.clientSecret` |  |  |
-| `prometheusOperator.grafana.oauth.scopes` |  | `"openid profile email offline_access groups"` |
-| `sealedSecrets.create` | Whether or not to install `sealed-secrets` |  |
-| `sealedSecrets.releaseName` | The Helm release name for `sealed-secrets` | `"sealed-secrets-controller"` |
-| `sealedSecrets.namespace` | The namespace to install `sealed-secrets` into | `"kube-system"` |
-| `velero.create` | Whether or not to install `velero` |  |
-| `velero.releaseName` | The Helm release name for `velero` | `"md-velero"` |
-| `velero.namespace` | The namespace to install `velero` into | `"md-velero"` |
-| `etcd.ca.crt` | The Kubernetes masters' CA certificate |  |
-| `etcd.healthcheckClient.crt` | The CA certificate for the `etcd` healthcheck client (also comes from Kubernetes masters) |  |
-| `etcd.healthcheckClient.key` | The private key for the `etcd` healthcheck client (also comes from Kubernetes masters) |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
+If all else fails, feel free to open an issue and we will try to help you!

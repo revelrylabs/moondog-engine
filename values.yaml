@@ -71,26 +71,26 @@ userPermissions:
         - watch
         - list
 
-auth:
-  - type: github
-    id: github:example-org
-    name: Example Org GitHub
-    oauth:
-      clientId: "Your GitHub OAuth client ID"
-      clientSecret: "Your GitHub OAuth client secret"
-    orgs:
-      - name: example-org
-        teams:
-          - name: administrators
-            permissions:
-              - namespace: '*'
-                roles:
-                  - md-read-write-all
-          - name: engineers
-            permissions:
-              - namespace: '*'
-                roles:
-                  - md-read-all-except-secrets
+auth: []
+  # - type: github
+  #   id: github:example-org
+  #   name: Example Org GitHub
+  #   oauth:
+  #     clientId: "Your GitHub OAuth client ID"
+  #     clientSecret: "Your GitHub OAuth client secret"
+  #   orgs:
+  #     - name: example-org
+  #       teams:
+  #         - name: administrators
+  #           permissions:
+  #             - namespace: '*'
+  #               roles:
+  #                 - md-read-write-all
+  #         - name: engineers
+  #           permissions:
+  #             - namespace: '*'
+  #               roles:
+  #                 - md-read-all-except-secrets
 
 aws:
   region: us-east-1

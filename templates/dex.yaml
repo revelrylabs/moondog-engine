@@ -19,7 +19,7 @@ spec:
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: dex
-    version: 2.5.0
+    version: 2.10.0
   values:
     grpc: false
     ports:
@@ -28,6 +28,7 @@ spec:
         servicePort: {{ .Values.dex.port }}
     config:
       issuer: https://dex.{{ .Values.hostedZone }}
+      enablePasswordDB: false
       connectors:
         {{- range .Values.auth }}
         - type: {{ .type | quote }}
@@ -38,7 +39,7 @@ spec:
             clientID: {{ .clientId | quote }}
             clientSecret: {{ .clientSecret | quote }}
             {{- end }}
-            redirectURI: $redirectURI
+            redirectURI: {{ $redirectURI | quote }}
             {{- if eq .type "github" }}
             {{- with .orgs }}
             orgs:
@@ -52,8 +53,7 @@ spec:
                 {{- end }}
               {{- end }}
             {{- end }}
-            {{- else if eq .type "google" }}
-            # TODO: Google-specific config goes here.
+            {{/* TODO: {{- else if eq .type "google" }} etc. */}}
             {{- end }}
         {{- end }}
       staticClients:

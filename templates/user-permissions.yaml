@@ -15,6 +15,11 @@ metadata:
       {{- end }}
     {{- end }}
   {{- else if eq .type "google" }}
+    {{/*
+      This is PROBABLY the right way to handle Google, but
+      it hasn't been tested yet because we haven't gotten Google
+      working in Dex yet.
+    */}}
     {{- range .hostedDomains }}
       {{ $domain := .name }}
       {{- range .groups }}

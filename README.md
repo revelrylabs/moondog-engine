@@ -72,7 +72,7 @@ config/
 
 You will need to download some files from your Kubernetes masters and put them in their respective directories in ./config
 
-If you used kubeadm, more information is here: 
+If you used kubeadm, more information is here:
 
 https://kubernetes.io/docs/setup/best-practices/certificates/#where-certificates-are-stored
 
@@ -93,7 +93,7 @@ Read any notes that are printed after successful installation, and follow any ad
 
 ## Post-install
 
-Some of the objects installed require DNS to work in order for them to start up and work correctly. After running the installer script, query your nginx service to discover the DNS address of your AWS Elastic Load Balancer (ELB) and add that as a wildcard for the domain, since this is where all of our web traffic will go. 
+Some of the objects installed require DNS to work in order for them to start up and work correctly. After running the installer script, query your nginx service to discover the DNS address of your AWS Elastic Load Balancer (ELB) and add that as a wildcard for the domain, since this is where all of our web traffic will go.
 
 Find the service with:
 
@@ -105,15 +105,15 @@ md-nginx-ingress-controller        LoadBalancer   10.96.228.202   somelongdns.us
 
 Then, for example, in your DNS create a CNAME for `*.foo.example.com` to `somelongdns.us-east-1.elb.amazonaws.com`
 
-This will allow traffic to reach the cluster and complete the installation process. At this point, certificates should begin to solve via `cert-manager`. Wait a bit and then check if you can reach 
+This will allow traffic to reach the cluster and complete the installation process. At this point, certificates should begin to solve via `cert-manager`. Wait a bit and then check if you can reach
 
 ## Troubleshooting
 
-Hopefully the installer will exit with a helpful error. If not, the line it exits on is going to be your best clue as to where to look to debug further. Ensure helmreleases are deployed correctly by running 
+Hopefully the installer will exit with a helpful error. If not, the line it exits on is going to be your best clue as to where to look to debug further. Ensure helmreleases are deployed correctly by running
 
-`helm list --all-namespaces` which should show `deployed` for all services. 
+`helm list --all-namespaces` which should show `deployed` for all services.
 
-If any of the components appear to be missing, you can describe the helmrelease to try to see what went wrong with its installation. Failing that, you can look at the logs of pods in the individual namespaces the installer creates for each helmrelease. 
+If any of the components appear to be missing, you can describe the helmrelease to try to see what went wrong with its installation. Failing that, you can look at the logs of pods in the individual namespaces the installer creates for each helmrelease.
 
 If all else fails feel free to open an issue and we will try to help you!
 
@@ -187,10 +187,8 @@ If all else fails feel free to open an issue and we will try to help you!
 | `etcd.ca.crt` | The Kubernetes masters' CA certificate |  |
 | `etcd.healthcheckClient.crt` | The CA certificate for the `etcd` healthcheck client (also comes from Kubernetes masters) |  |
 | `etcd.healthcheckClient.key` | The private key for the `etcd` healthcheck client (also comes from Kubernetes masters) |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
+| `metricsServer.create` | Whether or not to install `metrics-server` | true |
+| `metricsServer.version` | Chart version | [2.11.1](https://hub.helm.sh/charts/stable/metrics-server/2.11.1 ) |
+| `metricsServer.pspEnabled` | Whether or not to enable Pod Security Policy | true |
+| `metricsServer.hostNetworkEnabled` | Whether or not to enable host networking | true |
+| `metricsServer.args` | Command args to pass through to `metrics-server` | [] |

@@ -1,0 +1,26 @@
+{{- if .Values.metricsServer.create }}
+
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: metrics-server
+  namespace: kube-system
+spec:
+  releaseName: metrics-server
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: metrics-server
+    version: {{ .Values.metricsServer.version }}
+  values:
+    rbac:
+      pspEnabled: {{ .Values.metricsServer.pspEnabled }}
+    hostNetwork:
+      enabled: {{ .Values.metricsServer.hostNetworkEnabled }}
+  {{- with .Values.metricsServer.args}}
+    args:
+      {{- toYaml . | nindent 6}}
+  {{- else }}
+    args: []
+  {{- end }}
+
+{{- end }}

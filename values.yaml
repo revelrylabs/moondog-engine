@@ -148,3 +148,10 @@ etcd:
     {}
     # crt: "set via CLI"
     # key: "set via in CLI"
+
+metricsServer:
+  create: true
+  version: 2.11.1
+  pspEnabled: true
+  hostNetworkEnabled: true
+  args: []

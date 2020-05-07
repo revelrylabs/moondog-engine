@@ -16,7 +16,7 @@ spec:
   chart:
     repository: https://revelrylabs.github.io/helm-charts
     name: moondog-navigator
-    version: 0.0.4
+    version: 0.0.6
   values:
     appDomain: navigator.{{ .Values.hostedZone }}
     {{- with .Values.navigator.image }}

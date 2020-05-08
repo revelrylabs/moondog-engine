@@ -173,6 +173,9 @@ Configures the [`harbor`](https://github.com/goharbor/harbor-helm) chart.
 | `harbor.postgres.user` |  |  |
 | `harbor.postgres.password` |  |  |
 | `harbor.persistence.imageChartStorage` |  |  |
+| `harbor.dbBackups.bucketName` | string (optional) | Name of an S3 bucket to use for database backups. |
+| `harbor.dbBackups.credentials.accessKeyId` | string (optional) | Id of the AWS Access Key to access the S3 bucket for backups. |
+| `harbor.dbBackups.credentials.secretAccessKey` | string (optional) | AWS Secret Access Key to access the S3 bucket for backups. |
 
 ## kubedb
 

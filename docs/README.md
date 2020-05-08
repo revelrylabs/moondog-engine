@@ -170,7 +170,7 @@ Configures the [`harbor`](https://github.com/goharbor/harbor-helm) chart.
 | `harbor.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `harbor.namespace` | string (optional) | The namespace for the HelmRelease |
 | `harbor.releaseName` | string (optional) | The release name for the HelmRelease |
-| `harbor.adminPassword` | string (optional; default `"Harbor12345"`) | The initial password for Harbor's `admin` user. |
+| `harbor.adminPassword` | string (optional; default random) | The initial password for Harbor's `admin` user. |
 | `harbor.postgres.user` |  |  |
 | `harbor.postgres.password` |  |  |
 | `harbor.persistence.imageChartStorage` |  |  |

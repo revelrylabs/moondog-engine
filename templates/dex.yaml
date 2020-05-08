@@ -5,6 +5,9 @@ kind: Namespace
 metadata:
   name: {{ .Values.dex.namespace }}
 ---
+
+{{ $redirectURI := printf "https://dex.%s/callback" .Values.hostedZone }}
+
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -16,7 +19,7 @@ spec:
   chart:
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: dex
-    version: 2.5.0
+    version: 2.10.0
   values:
     grpc: false
     ports:
@@ -25,22 +28,34 @@ spec:
         servicePort: {{ .Values.dex.port }}
     config:
       issuer: https://dex.{{ .Values.hostedZone }}
+      enablePasswordDB: false
       connectors:
-        {{- if .Values.github }}
-        - type: github
-          id: github
-          name: GitHub
+        {{- range .Values.auth }}
+        - type: {{ .type | quote }}
+          id: {{ .id | quote }}
+          name: {{ .name | quote }}
           config:
-            clientID: {{ .Values.github.oauth.clientId }}
-            clientSecret: {{ .Values.github.oauth.clientSecret }}
-            redirectURI: https://dex.{{ .Values.hostedZone }}/callback
+            {{- with .oauth }}
+            clientID: {{ .clientId | quote }}
+            clientSecret: {{ .clientSecret | quote }}
+            {{- end }}
+            redirectURI: {{ $redirectURI | quote }}
+            {{- if eq .type "github" }}
+            {{- with .orgs }}
             orgs:
-            - name: {{ .Values.github.organization }}
-              teams:
-                {{- range .Values.github.teams }}
-                - {{ . }}
+              {{- range . }}
+              - name: {{ .name | quote }}
+                {{- with .teams }}
+                teams:
+                  {{- range . }}
+                  - {{ .name | quote }}
+                  {{- end }}
                 {{- end }}
-        {{- end}}
+              {{- end }}
+            {{- end }}
+            {{/* TODO: {{- else if eq .type "google" }} etc. */}}
+            {{- end }}
+        {{- end }}
       staticClients:
         - id: {{ .Values.dex.oauth.clientId | quote }}
           name: {{ .Values.dex.oauth.clientId | quote }}
@@ -77,116 +92,5 @@ spec:
         - secretName: dex-tls
           hosts:
             - dex.{{ .Values.hostedZone }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: clusterwide-admin
-rules:
-- apiGroups:
-  - '*'
-  resources:
-  - '*'
-  verbs:
-  - '*'
-- nonResourceURLs:
-  - '*'
-  verbs:
-  - '*'
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: dex-cluster-auth-admin
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: clusterwide-admin
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: {{ .Values.github.organization }}:{{ .Values.dex.admin_team}}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: cluster-read-all
-rules:
-- apiGroups:
-  - ""
-  - apps
-  - autoscaling
-  - batch
-  - extensions
-  - policy
-  - rbac.authorization.k8s.io
-  - storage.k8s.io
-  resources:
-  - componentstatuses
-  - configmaps
-  - cronjobs
-  - daemonsets
-  - deployments
-  - events
-  - endpoints
-  - horizontalpodautoscalers
-  - ingress
-  - ingresses
-  - jobs
-  - limitranges
-  - namespaces
-  - nodes
-  - pods
-  - pods/log
-  - pods/exec
-  - persistentvolumes
-  - persistentvolumeclaims
-  - resourcequotas
-  - replicasets
-  - replicationcontrollers
-  - serviceaccounts
-  - services
-  - services/proxy
-  - statefulsets
-  - storageclasses
-  - clusterroles
-  - roles
-  verbs:
-  - get
-  - watch
-  - list
-- nonResourceURLs:
-  - '*'
-  verbs:
-  - get
-  - watch
-  - list
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - list
-  - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: dex-cluster-auth
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-read-all
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: {{ .Values.github.organization }}:{{ .Values.dex.readonly_team}}
 
 {{- end }}

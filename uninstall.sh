@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # Ideally we combine this script with the installer so they can share constants
 helm_operator_namespace=md-helm-operator

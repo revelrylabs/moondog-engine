@@ -5,15 +5,92 @@ helmReleaseTimeout: 1600
 ca: {}
 #   crt: "set via cli"
 #   key: "set via cli"
-github:
-  organization: "your org"
-  teams:
-    - "a github team in your org"
-    - "another github team in your org"
-  oauth:
-    {}
-    # clientId: "your oauth client id"
-    # clientSecret: "your oauth client secret"
+
+userPermissions:
+  namespace: md-user-permissions
+  roleDefinitions:
+    md-read-write-all:
+      - apiGroups:
+          - '*'
+        resources:
+          - '*'
+        verbs:
+          - '*'
+      - nonResourceURLs:
+          - '*'
+        verbs:
+          - '*'
+    md-read-all-except-secrets:
+      - apiGroups:
+        - ""
+        - apps
+        - autoscaling
+        - batch
+        - extensions
+        - policy
+        - rbac.authorization.k8s.io
+        - storage.k8s.io
+        resources:
+        - componentstatuses
+        - configmaps
+        - cronjobs
+        - daemonsets
+        - deployments
+        - events
+        - endpoints
+        - horizontalpodautoscalers
+        - ingress
+        - ingresses
+        - jobs
+        - limitranges
+        - namespaces
+        - nodes
+        - pods
+        - pods/log
+        - pods/exec
+        - persistentvolumes
+        - persistentvolumeclaims
+        - resourcequotas
+        - replicasets
+        - replicationcontrollers
+        - serviceaccounts
+        - services
+        - services/proxy
+        - statefulsets
+        - storageclasses
+        - clusterroles
+        - roles
+        verbs:
+        - get
+        - watch
+        - list
+      - nonResourceURLs:
+        - '*'
+        verbs:
+        - get
+        - watch
+        - list
+
+auth: []
+  # - type: github
+  #   id: github:example-org
+  #   name: Example Org GitHub
+  #   oauth:
+  #     clientId: "Your GitHub OAuth client ID"
+  #     clientSecret: "Your GitHub OAuth client secret"
+  #   orgs:
+  #     - name: example-org
+  #       teams:
+  #         - name: administrators
+  #           permissions:
+  #             - namespace: '*'
+  #               roles:
+  #                 - md-read-write-all
+  #         - name: engineers
+  #           permissions:
+  #             - namespace: '*'
+  #               roles:
+  #                 - md-read-all-except-secrets
 
 aws:
   region: us-east-1

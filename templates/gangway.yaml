@@ -6,12 +6,12 @@ metadata:
   name: {{ .Values.gangway.namespace }}
 ---
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: ca.crt
+  name: ca-crt
   namespace: {{ .Values.gangway.namespace }}
 data:
-  ca.crt: {{ .Values.ca.crt | b64enc | quote }}
+  ca.crt: {{ .Values.ca.crt | quote }}
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
@@ -28,8 +28,8 @@ spec:
   values:
     extraVolumes:
       - name: ca-crt
-        secret:
-          secretName: ca.crt
+        configMap:
+          name: ca-crt
     extraVolumeMounts:
       - name: ca-crt
         mountPath: /etc/ca

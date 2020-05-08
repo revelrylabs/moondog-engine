@@ -136,10 +136,6 @@ gangway:
   create: true
   releaseName: md-gangway
   namespace: md-gangway
-  oauth:
-    clientId: gangway
-    scopes: openid profile email offline_access groups
-    # clientSecret
 
 harbor:
   create: true

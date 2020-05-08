@@ -18,6 +18,9 @@ spec:
     name: harbor
     version: 1.3.1
   values:
+    {{- if .Values.harbor.adminPassword }}
+    harborAdminPassword: {{ .Values.harbor.adminPassword | quote }}
+    {{- end }}
     secretKey: {{ randAlphaNum 16 | quote }}
     expose:
       ingress:

@@ -152,6 +152,7 @@ If all else fails feel free to open an issue and we will try to help you!
 | `harbor.create` | Whether or not to install `harbor` |  |
 | `harbor.releaseName` | The Helm release name for `harbor` | `"md-harbor"` |
 | `harbor.namespace` | The namespace to install `harbor` into | `"md-harbor"` |
+| `harbor.adminPassword` | The initial password for Harbor's `admin` user. (Sign into the web UI and change it.) | `"Harbor12345"` |
 | `harbor.persistence` | Allows override for the `harbor` Helm chart's parameter of the same name | (See https://helm.goharbor.io) |
 | `harbor.postgres.user` | The name of the user to create and use with the included PostgreSQL instance | `"md_harbor"` |
 | `harbor.postgres.password` | The password for the user to create and use with the included PostgreSQL instance |  |

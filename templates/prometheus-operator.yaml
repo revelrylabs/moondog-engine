@@ -38,14 +38,14 @@ spec:
         log:
           level: debug
         server:
-          domain: grafana.{{ .Values.hostedZone }}
-          root_url: https://grafana.{{ .Values.hostedZone }}/
+          domain: grafana.{{ .Values.domainSuffix }}
+          root_url: https://grafana.{{ .Values.domainSuffix }}/
         auth.generic_oauth:
           enabled: true
           client_id: {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
           client_secret: {{ .Values.prometheusOperator.grafana.oauth.clientSecret | quote }}
           scopes: {{ printf "%s audience:server:client_id:%s" .Values.prometheusOperator.grafana.oauth.scopes .Values.dex.oauth.clientId | quote}}
-          auth_url: https://dex.{{ .Values.hostedZone }}/auth
+          auth_url: https://dex.{{ .Values.domainSuffix }}/auth
           token_url: http://{{ .Values.dex.releaseName }}.{{ .Values.dex.namespace }}.svc:32000/token
           api_url:
       ingress:
@@ -54,12 +54,12 @@ spec:
           kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: letsencrypt
         hosts:
-          - grafana.{{ .Values.hostedZone }}
+          - grafana.{{ .Values.domainSuffix }}
         path: /
         tls:
           - secretName: grafana-tls
             hosts:
-              - grafana.{{ .Values.hostedZone }}
+              - grafana.{{ .Values.domainSuffix }}
       persistence:
         enabled: true
         type: pvc
@@ -77,16 +77,16 @@ spec:
         annotations:
           kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: letsencrypt
-          nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/auth"
-          nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
+          nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
         hosts:
-          - alertmanager.{{ .Values.hostedZone }}
+          - alertmanager.{{ .Values.domainSuffix }}
         paths:
           - /
         tls:
           - secretName: alertmanager-tls
             hosts:
-              - alertmanager.{{ .Values.hostedZone }}
+              - alertmanager.{{ .Values.domainSuffix }}
       alertmanagerSpec:
         storage:
           volumeClaimTemplate:
@@ -109,16 +109,16 @@ spec:
         annotations:
           kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: letsencrypt
-          nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/auth"
-          nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.hostedZone }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
+          nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
         hosts:
-          - prometheus.{{ .Values.hostedZone }}
+          - prometheus.{{ .Values.domainSuffix }}
         paths:
           - /
         tls:
           - secretName: prometheus-tls
             hosts:
-              - prometheus.{{ .Values.hostedZone }}
+              - prometheus.{{ .Values.domainSuffix }}
     kubeEtcd:
       serviceMonitor:
         scheme: https

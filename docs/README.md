@@ -10,7 +10,7 @@ A short identifier for your cluster. Use something with all lowercase and no spa
 
 The public URL of your Kubernetes cluster's API server. Typically something like `https://api.k8.example.com:6443`.
 
-## hostedZone
+## domainSuffix
 
 A string that configures the domain suffix for all of the ingresses created by Moondog Engine. For example, if you set it to `moondog.example.com`, you will end up with your various apps hosted at domains like:
 

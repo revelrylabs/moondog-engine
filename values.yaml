@@ -1,6 +1,6 @@
 clusterName: foo
 apiServerUrl: https://api.example.com
-hostedZone: "example.com"
+domainSuffix: "example.com"
 helmReleaseTimeout: 1600
 ca: {}
 #   crt: "set via cli"

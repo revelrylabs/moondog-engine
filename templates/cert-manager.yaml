@@ -19,17 +19,15 @@ spec:
     version: v0.13.0
   values:
     replicaCount: {{ .Values.certManager.replicaCount }}
-{{- if .Values.certManager.fake}}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ca-cert-key
+  name: ca-issuer-keypair
   namespace: {{ .Values.certManager.namespace }}
 data:
   tls.crt: {{ .Values.ca.crt | b64enc | quote }}
   tls.key: {{ .Values.ca.key | b64enc | quote }}
-{{- end}}
 ---
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
@@ -37,12 +35,8 @@ metadata:
   name: letsencrypt
   namespace: {{ .Values.certManager.namespace }}
 spec:
-  {{- if .Values.certManager.fake}}
-  ca:
-    secretName: ca-cert-key
-  {{- else}}
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory 
+    server: https://acme-v02.api.letsencrypt.org/directory
     email: {{ .Values.certManager.email | quote }}
     privateKeySecretRef:
       name: letsencrypt
@@ -50,6 +44,30 @@ spec:
       - http01:
           ingress:
             class: nginx
-  {{- end }}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+  namespace: {{ .Values.certManager.namespace }}
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: {{ .Values.certManager.email | quote }}
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: ca-issuer
+  namespace: {{ .Values.certManager.namespace }}
+spec:
+  ca:
+    secretName: ca-issuer-keypair
 
 {{- end }}

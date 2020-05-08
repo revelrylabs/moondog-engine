@@ -34,7 +34,7 @@ spec:
         - oauth2-proxy.{{ .Values.hostedZone }}
       annotations:
         kubernetes.io/ingress.class: nginx
-        cert-manager.io/cluster-issuer: letsencrypt
+        cert-manager.io/cluster-issuer: {{ .Values.certManager.defaultClusterIssuer | quote }}
       tls:
         - secretName: oauth2-proxy-tls
           hosts:

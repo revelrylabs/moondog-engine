@@ -26,7 +26,7 @@ spec:
           notary: harbor-notary.{{ .Values.hostedZone }}
         annotations:
           kubernetes.io/ingress.class: nginx
-          cert-manager.io/cluster-issuer: letsencrypt
+          cert-manager.io/cluster-issuer: {{ .Values.certManager.defaultClusterIssuer | quote }}
       tls:
         notarySecretName: tls-harbor-notary-ingress
         secretName: tls-harbor-ingress

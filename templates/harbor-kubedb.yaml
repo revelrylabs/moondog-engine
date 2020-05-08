@@ -1,9 +1,6 @@
 {{- if and .Values.harbor.create .Values.kubedb.create }}
 
-{{- $backupsEnabled := false }}
-{{- with .Values.harbor.dbBackups }}
-  {{ $backupsEnabled = and .bucketName .credentials.accessKeyId .credentials.secretAccessKey }}
-{{- end }}
+{{- $backupsEnabled := .Values.harbor.dbBackups.enabled }}
 
 apiVersion: v1
 kind: Namespace

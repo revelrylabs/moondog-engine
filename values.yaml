@@ -147,7 +147,8 @@ harbor:
   namespace: md-harbor
   postgres:
     user: md_harbor
-  dbBackups: {}
+  dbBackups:
+    enabled: true
     # bucketName: S3_BUCKET_NAME
     # credentials:
     #   accessKeyId: AWS_ACCESS_KEY_ID

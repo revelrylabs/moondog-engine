@@ -118,6 +118,7 @@ Configures the [`cert-manager`](https://hub.helm.sh/charts/jetstack/cert-manager
 | `certManager.namespace` | string (optional) | The namespace for the HelmRelease |
 | `certManager.releaseName` | string (optional) | The release name for the HelmRelease |
 | `certManager.replicaCount` | integer (optional; default `1`) | The number of replicas for the deployment |
+| `certManager.server` | string (optional; defaults to LetsEncrypt production) | This override is provided mainly so that developers can point their cert-manager at LetsEncrypt staging to test |
 | `certManager.email` | string | The support email address reported to LetsEncrypt |
 
 ## dex

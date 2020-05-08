@@ -42,7 +42,7 @@ spec:
     secretName: ca-cert-key
   {{- else}}
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory 
+    server: {{ .Values.certManager.server | quote }}
     email: {{ .Values.certManager.email | quote }}
     privateKeySecretRef:
       name: letsencrypt

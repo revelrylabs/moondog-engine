@@ -107,6 +107,7 @@ aws:
 certManager:
   create: true
   fake: false
+  server: https://acme-v02.api.letsencrypt.org/directory 
   replicaCount: 1
   releaseName: md-cert-manager
   namespace: md-cert-manager

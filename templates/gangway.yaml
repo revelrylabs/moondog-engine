@@ -40,10 +40,10 @@ spec:
       clientID: {{ .Values.dex.oauth.clientId | quote }}
       clientSecret: {{ .Values.dex.oauth.clientSecret | quote }}
       sessionKey: {{ randAlphaNum 32 | b64enc | quote }}
-      authorizeURL: https://dex.{{ .Values.hostedZone }}/auth
-      tokenURL: https://dex.{{ .Values.hostedZone }}/token
-      audience: https://dex.{{ .Values.hostedZone }}/userinfo
-      redirectURL: https://gangway.{{ .Values.hostedZone }}/callback
+      authorizeURL: https://dex.{{ .Values.domainSuffix }}/auth
+      tokenURL: https://dex.{{ .Values.domainSuffix }}/token
+      audience: https://dex.{{ .Values.domainSuffix }}/userinfo
+      redirectURL: https://gangway.{{ .Values.domainSuffix }}/callback
       trustedCAPath: /etc/ca/ca.crt
       scopes:
         - openid
@@ -57,10 +57,10 @@ spec:
         kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt
       hosts:
-        - gangway.{{ .Values.hostedZone }}
+        - gangway.{{ .Values.domainSuffix }}
       tls:
         - secretName: gangway-tls
           hosts:
-            - gangway.{{ .Values.hostedZone }}
+            - gangway.{{ .Values.domainSuffix }}
 
 {{- end }}

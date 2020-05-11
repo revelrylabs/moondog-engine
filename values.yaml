@@ -1,6 +1,6 @@
 clusterName: foo
 apiServerUrl: https://api.example.com
-hostedZone: "example.com"
+domainSuffix: "example.com"
 helmReleaseTimeout: 1600
 ca: {}
 #   crt: "set via cli"
@@ -136,17 +136,20 @@ gangway:
   create: true
   releaseName: md-gangway
   namespace: md-gangway
-  oauth:
-    clientId: gangway
-    scopes: openid profile email offline_access groups
-    # clientSecret
 
 harbor:
   create: true
   releaseName: md-harbor
   namespace: md-harbor
+  # adminPassword: "your admin password"
   postgres:
     user: md_harbor
+  dbBackups:
+    enabled: true
+    # bucketName: S3_BUCKET_NAME
+    # credentials:
+    #   accessKeyId: AWS_ACCESS_KEY_ID
+    #   secretAccessKey: AWS_SECRET_ACCESS_KEY
   persistence:
     imageChartStorage: {}
 #  we use S3 but this can be defined as any type you like per the harbor chart here:

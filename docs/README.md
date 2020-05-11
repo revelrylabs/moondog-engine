@@ -10,7 +10,7 @@ A short identifier for your cluster. Use something with all lowercase and no spa
 
 The public URL of your Kubernetes cluster's API server. Typically something like `https://api.k8.example.com:6443`.
 
-## hostedZone
+## domainSuffix
 
 A string that configures the domain suffix for all of the ingresses created by Moondog Engine. For example, if you set it to `moondog.example.com`, you will end up with your various apps hosted at domains like:
 
@@ -104,7 +104,7 @@ auth:
 For typical usage of Moondog Engine on AWS, you should not need to customize the `ebsVolumeTypes`. This configuration will create a `StorageClass` for each of the different volume types in the AWS `region`.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `aws.region` | string (optional; default `"us-east-1"`) |  |
 | `aws.ebsVolumeTypes` | list (optional) |  |
 
@@ -113,7 +113,7 @@ For typical usage of Moondog Engine on AWS, you should not need to customize the
 Configures the [`cert-manager`](https://hub.helm.sh/charts/jetstack/cert-manager) chart to automatically provision TLS certificates from [LetsEncrypt](https://letsencrypt.org/).
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `certManager.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `certManager.namespace` | string (optional) | The namespace for the HelmRelease |
 | `certManager.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -130,7 +130,7 @@ Configures the [`dex`](https://hub.helm.sh/charts/stable/dex) chart. For typical
 Moondog Engine's [`auth` configuration](#auth) will configure your Dex `connectors`, and other apps included in Moondog Engine will configure their own `staticClients` in Dex.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `dex.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `dex.namespace` | string (optional) | The namespace for the HelmRelease |
 | `dex.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -143,7 +143,7 @@ Moondog Engine's [`auth` configuration](#auth) will configure your Dex `connecto
 Configures the [`flux`](https://github.com/fluxcd/flux/tree/master/chart/flux) chart for enabling GitOps. This will allow you to manage cluster resources simply by committing YAML files to a git repository.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `flux.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `flux.namespace` | string (optional) | The namespace for the HelmRelease |
 | `flux.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -156,7 +156,7 @@ Configures the [`flux`](https://github.com/fluxcd/flux/tree/master/chart/flux) c
 Configures the [`gangway`]() chart to allow users to authenticate via Dex to get a downloadable configuration that will give them the same identity and access to the `kubectl` CLI.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `gangway.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `gangway.namespace` | string (optional) | The namespace for the HelmRelease |
 | `gangway.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -166,20 +166,25 @@ Configures the [`gangway`]() chart to allow users to authenticate via Dex to get
 Configures the [`harbor`](https://github.com/goharbor/harbor-helm) chart.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `harbor.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `harbor.namespace` | string (optional) | The namespace for the HelmRelease |
 | `harbor.releaseName` | string (optional) | The release name for the HelmRelease |
+| `harbor.adminPassword` | string (optional; default random) | The initial password for Harbor's `admin` user. |
 | `harbor.postgres.user` |  |  |
 | `harbor.postgres.password` |  |  |
 | `harbor.persistence.imageChartStorage` |  |  |
+| `harbor.dbBackups.enabled` | boolean (optional; default `true`) | Whether to enable DB backups. `true` requires the other backup options also. |
+| `harbor.dbBackups.bucketName` | string (optional) | Name of an S3 bucket to use for database backups. |
+| `harbor.dbBackups.credentials.accessKeyId` | string (optional) | Id of the AWS Access Key to access the S3 bucket for backups. |
+| `harbor.dbBackups.credentials.secretAccessKey` | string (optional) | AWS Secret Access Key to access the S3 bucket for backups. |
 
 ## kubedb
 
 Configures the [`kubedb`](https://github.com/kubedb/installer/tree/v0.13.0-rc.0/chart/kubedb) and [`kubedb-catalog`](https://github.com/kubedb/installer/tree/v0.13.0-rc.0/chart/kubedb-catalog) charts to provide in-cluster database provisioning. This is used by some of the apps included with Moondog Engine, in addition to being useful for your own apps.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `kubedb.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `kubedb.namespace` | string (optional) | The namespace for the HelmRelease |
 | `kubedb.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -192,7 +197,7 @@ Configures the [`nginx-ingress`](https://github.com/helm/charts/tree/master/stab
 For typical Moondog Engine usage, you should not need to change any of the default configuration.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `nginxIngress.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `nginxIngress.namespace` | string (optional) | The namespace for the HelmRelease |
 | `nginxIngress.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -202,7 +207,7 @@ For typical Moondog Engine usage, you should not need to change any of the defau
 Configures the [`loki-stack`](https://github.com/grafana/loki/tree/master/production/helm) chart to collect pod logs, which Moondog Engine will make searchable via Grafana.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `lokiStack.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `lokiStack.namespace` | string (optional) | The namespace for the HelmRelease |
 | `lokiStack.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -214,7 +219,7 @@ Configures the [`oauth2-proxy`](https://hub.helm.sh/charts/stable/oauth2-proxy) 
 For typical Moondog Engine usage, you should only need to set `oauth.clientSecret` to an arbitrary random string.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `oauth2Proxy.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `oauth2Proxy.namespace` | string (optional) | The namespace for the HelmRelease |
 | `oauth2Proxy.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -228,7 +233,7 @@ Configures the [`prometheus-operator`](https://github.com/helm/charts/tree/maste
 For typical Moondog Engine usage, you should only need to set `grafana.oauth.clientSecret` to an arbitrary random string.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `prometheusOperator.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `prometheusOperator.namespace` | string (optional) | The namespace for the HelmRelease |
 | `prometheusOperator.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -244,7 +249,7 @@ Configures the [`sealed-secrets`](https://github.com/helm/charts/tree/master/sta
 For typical Moondog Engine usage, you should not need to change any of the default configuration.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `sealedSecrets.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `sealedSecrets.namespace` | string (optional) | The namespace for the HelmRelease |
 | `sealedSecrets.releaseName` | string (optional) | The release name for the HelmRelease |
@@ -254,7 +259,7 @@ For typical Moondog Engine usage, you should not need to change any of the defau
 Configures the [`velero`](https://github.com/vmware-tanzu/helm-charts/tree/master/charts/velero) chart to back up the cluster's resources and volumes to Amazon S3.
 
 | name | type | description |
-| `----` | ---- | ----------- |
+| ---- | ---- | ----------- |
 | `velero.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `velero.namespace` | string (optional) | The namespace for the HelmRelease |
 | `velero.releaseName` | string (optional) | The release name for the HelmRelease |

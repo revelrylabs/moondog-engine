@@ -32,11 +32,10 @@ PKI certificates and keys. Typically you will provide these to the Moondog Engin
 
 | name | type | description |
 | `----` | ---- | ----------- |
-| `ca.crt` | string | The cluster CA certificate |
-| `ca.key` | string | The cluster CA private key |
-| `etcd.ca.crt` | string | The etcd CA certificate |
-| `etcd.healthcheck-client.crt` | string | The etcd healthcheck-client certificate |
-| `etcd.healthcheck-client.key` | string | The etcd healthcheck-client private key |
+| `pki.ca.crt` | string | The cluster CA certificate |
+| `pki.etcd.ca.crt` | string | The etcd CA certificate |
+| `pki.etcd.healthcheckClient.crt` | string | The etcd healthcheck-client certificate |
+| `pki.etcd.healthcheckClient.key` | string | The etcd healthcheck-client private key |
 
 ## userPermissions
 

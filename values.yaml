@@ -10,7 +10,7 @@ pki:
   etcd:
     ca: {}
     # crt: "set via CLI"
-    healthcheck-client:
+    healthcheckClient:
       {}
       # crt: "set via CLI"
       # key: "set via in CLI"

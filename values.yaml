@@ -141,6 +141,7 @@ harbor:
   create: true
   releaseName: md-harbor
   namespace: md-harbor
+  # adminPassword: "your admin password"
   postgres:
     user: md_harbor
   dbBackups:

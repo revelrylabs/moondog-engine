@@ -20,7 +20,7 @@ spec:
     config:
       clientID: {{ .Values.oauth2Proxy.oauth.clientId | quote }}
       clientSecret: {{ .Values.oauth2Proxy.oauth.clientSecret | quote }}
-      cookieSecret: {{ include "moondog.bytes32" (dict "input" .Values.oauth2Proxy.oauth.cookieSecret) }}
+      cookieSecret: {{ include "moondog.random32" .Values.oauth2Proxy.oauth.cookieSecret | b64enc | quote }}
     extraArgs:
       cookie-domain: .{{ .Values.domainSuffix }}
       whitelist-domain: .{{ .Values.domainSuffix }}

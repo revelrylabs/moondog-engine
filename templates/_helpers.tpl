@@ -45,20 +45,29 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{/*
-32 bytes of user-supplied or random characters, base64 encoded
+If input is given, check that it's 32 bytes in length
+If no input is given, generate 32 random bytes
 */}}
-{{- define "moondog.bytes32" -}}
-{{- $param := (dict "length" 32 "input" .input) -}}
-{{- (include "moondog.randomPadded" $param) | b64enc | quote -}}
+{{- define "moondog.random32" -}}
+{{- $value := default (randAlphaNum 32) . }}
+{{- $length := len $value }}
+{{- if eq $length 32 -}}
+{{ $value }}
+{{- else -}}
+{{- fail "Value must be exactly 32 bytes" -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
-Get a string of a certain length
-truncated and/or padded with random chars if necessary
+If input is given, check that it's 16 bytes in length
+If no input is given, generate 16 random bytes
 */}}
-{{- define "moondog.randomPadded" -}}
-{{- $length := .length }}
-{{- $input := default "" .input }}
-{{- $padding := randAlphaNum $length }}
-{{- printf "%s%s" $input $padding | trunc $length -}}
+{{- define "moondog.random16" -}}
+{{- $value := default (randAlphaNum 16) . }}
+{{- $length := len $value }}
+{{- if eq $length 16 -}}
+{{ $value }}
+{{- else -}}
+{{- fail "Value must be exactly 16 bytes" -}}
+{{- end -}}
 {{- end -}}

@@ -39,7 +39,7 @@ spec:
       clusterName: {{ .Values.clusterName }}
       clientID: {{ .Values.dex.oauth.clientId | quote }}
       clientSecret: {{ .Values.dex.oauth.clientSecret | quote }}
-      sessionKey: {{ include "moondog.bytes32" (dict "input" .Values.gangway.sessionKey) }}
+      sessionKey: {{ include "moondog.random32" .Values.gangway.sessionKey | b64enc | quote }}
       authorizeURL: https://dex.{{ .Values.domainSuffix }}/auth
       tokenURL: https://dex.{{ .Values.domainSuffix }}/token
       audience: https://dex.{{ .Values.domainSuffix }}/userinfo

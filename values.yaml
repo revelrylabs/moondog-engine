@@ -2,9 +2,18 @@ clusterName: foo
 apiServerUrl: https://api.example.com
 domainSuffix: "example.com"
 helmReleaseTimeout: 1600
-ca: {}
-#   crt: "set via cli"
-#   key: "set via cli"
+
+pki:
+  ca: {}
+    # crt: "set via cli"
+    # key: "set via cli"
+  etcd:
+    ca: {}
+    # crt: "set via CLI"
+    healthcheck-client:
+      {}
+      # crt: "set via CLI"
+      # key: "set via in CLI"
 
 userPermissions:
   namespace: md-user-permissions
@@ -223,11 +232,3 @@ velero:
   create: true
   releaseName: md-velero
   namespace: md-velero
-
-etcd:
-  ca: {}
-  # crt: "set via CLI"
-  healthcheckClient:
-    {}
-    # crt: "set via CLI"
-    # key: "set via in CLI"

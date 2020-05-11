@@ -23,10 +23,10 @@ function setfile() {
   fi
 }
 
-setfile ca.crt config/pki/ca.crt
-setfile etcd.ca.crt config/pki/etcd/ca.crt
-setfile etcd.healthcheckClient.crt config/pki/etcd/healthcheck-client.crt
-setfile etcd.healthcheckClient.key config/pki/etcd/healthcheck-client.key
+setfile pki.ca.crt config/pki/ca.crt
+setfile pki.etcd.ca.crt config/pki/etcd/ca.crt
+setfile pki.etcd.healthcheck-client.crt config/pki/etcd/healthcheck-client.crt
+setfile pki.etcd.healthcheck-client.key config/pki/etcd/healthcheck-client.key
 
 if [ -n "$values_from_files" ]
 then

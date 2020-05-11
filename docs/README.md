@@ -26,24 +26,17 @@ For typical Moondog Engine usage, you should not need to change the default.
 
 `helmReleaseTimeout` is an integer number of seconds that a HelmRelease will wait to install before declaring failure. Defaults to `1600`.
 
-## ca
+## pki
 
-Self-signed CA certificate and private key. Typically you will provide this to the Moondog Engine installer by putting files into the `config/pki/ca` directory.
-
-| name | type | description |
-| `----` | ---- | ----------- |
-| `ca.crt` | string |  |
-| `ca.key` | string |  |
-
-## etcd
-
-PKI for etcd things. Typically you will provide this to the Moondog Engine installer by putting files into the `config/pki/etcd` directory.
+PKI certificates and keys. Typically you will provide these to the Moondog Engine installer by putting files into the `config/pki` directory.
 
 | name | type | description |
 | `----` | ---- | ----------- |
-| `etcd.ca.crt` | string |  |
-| `etcd.healthcheckClient.crt` | string |  |
-| `etcd.healthcheckClient.key` | string |  |
+| `ca.crt` | string | The cluster CA certificate |
+| `ca.key` | string | The cluster CA private key |
+| `etcd.ca.crt` | string | The etcd CA certificate |
+| `etcd.healthcheck-client.crt` | string | The etcd healthcheck-client certificate |
+| `etcd.healthcheck-client.key` | string | The etcd healthcheck-client private key |
 
 ## userPermissions
 

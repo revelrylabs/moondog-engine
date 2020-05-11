@@ -143,6 +143,12 @@ harbor:
   namespace: md-harbor
   postgres:
     user: md_harbor
+  dbBackups:
+    enabled: true
+    # bucketName: S3_BUCKET_NAME
+    # credentials:
+    #   accessKeyId: AWS_ACCESS_KEY_ID
+    #   secretAccessKey: AWS_SECRET_ACCESS_KEY
   persistence:
     imageChartStorage: {}
 #  we use S3 but this can be defined as any type you like per the harbor chart here:

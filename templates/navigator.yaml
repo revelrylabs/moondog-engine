@@ -18,7 +18,7 @@ spec:
     name: moondog-navigator
     version: 0.0.6
   values:
-    appDomain: navigator.{{ .Values.hostedZone }}
+    appDomain: navigator.{{ .Values.domainSuffix }}
     {{- with .Values.navigator.image }}
     image:
       {{- toYaml . | nindent 6 }}
@@ -34,7 +34,7 @@ spec:
           oidcClientId: {{ .Values.dex.oauth.clientId | quote }}
         caCertUrl: {{ .Values.navigator.caCertUrl | quote }}
         oidc:
-          authUrl: https://dex.{{ .Values.hostedZone }}/auth
+          authUrl: https://dex.{{ .Values.domainSuffix }}/auth
           tokenUrl: http://{{ .Values.dex.releaseName }}.{{ .Values.dex.namespace }}.svc:32000/token
           clientId: {{ .Values.navigator.oauth.clientId | quote }}
           clientSecret: {{ .Values.navigator.oauth.clientSecret | quote }}
@@ -44,10 +44,10 @@ spec:
         kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: {{ .Values.certManager.defaultClusterIssuer | quote }}
       hosts:
-        - host: navigator.{{ .Values.hostedZone }}
+        - host: navigator.{{ .Values.domainSuffix }}
           paths: ["/"]
       tls:
         - secretName: moondog-navigator-cert
           hosts:
-            - navigator.{{ .Values.hostedZone }}
+            - navigator.{{ .Values.domainSuffix }}
 {{- end }}

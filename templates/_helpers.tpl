@@ -43,3 +43,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+{{/*
+32 bytes of user-supplied or random characters, base64 encoded
+*/}}
+{{- define "moondog.bytes32" -}}
+{{- $param := (dict "length" 32 "input" .input) -}}
+{{- (include "moondog.randomPadded" $param) | b64enc | quote -}}
+{{- end -}}
+
+{{/*
+Get a string of a certain length
+truncated and/or padded with random chars if necessary
+*/}}
+{{- define "moondog.randomPadded" -}}
+{{- $length := .length }}
+{{- $input := default "" .input }}
+{{- $padding := randAlphaNum $length }}
+{{- printf "%s%s" $input $padding | trunc $length -}}
+{{- end -}}

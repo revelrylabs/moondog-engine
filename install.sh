@@ -37,8 +37,8 @@ fi
 
 ### GENERATE THE TEMPLATE OUTPUTS
 
-# create tmp directory if it does not exist
-mkdir -p tmp
+# create tmp directory if it does not exist, and clear out files from previous runs
+mkdir -p tmp && rm -rf tmp/*
 
 # template out the chart
 helm template . \

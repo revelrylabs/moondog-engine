@@ -52,7 +52,7 @@ spec:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: nginx
-          cert-manager.io/cluster-issuer: letsencrypt
+          cert-manager.io/cluster-issuer: {{ .Values.certManager.defaultClusterIssuer | quote }}
         hosts:
           - grafana.{{ .Values.domainSuffix }}
         path: /
@@ -76,7 +76,7 @@ spec:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: nginx
-          cert-manager.io/cluster-issuer: letsencrypt
+          cert-manager.io/cluster-issuer: {{ .Values.certManager.defaultClusterIssuer | quote }}
           nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/auth"
           nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
         hosts:
@@ -108,7 +108,7 @@ spec:
         enabled: true
         annotations:
           kubernetes.io/ingress.class: nginx
-          cert-manager.io/cluster-issuer: letsencrypt
+          cert-manager.io/cluster-issuer: {{ .Values.certManager.defaultClusterIssuer | quote }}
           nginx.ingress.kubernetes.io/auth-url: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/auth"
           nginx.ingress.kubernetes.io/auth-signin: "https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
         hosts:

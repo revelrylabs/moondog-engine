@@ -119,6 +119,7 @@ Configures the [`cert-manager`](https://hub.helm.sh/charts/jetstack/cert-manager
 | `certManager.releaseName` | string (optional) | The release name for the HelmRelease |
 | `certManager.replicaCount` | integer (optional; default `1`) | The number of replicas for the deployment |
 | `certManager.email` | string | The support email address reported to LetsEncrypt |
+| `certManager.defaultClusterIssuer` | string (optional; default `"letsencrypt"`) | Can be switched to `"letsencrypt-staging"` for testing to use LetsEncrypt's [staging environment](https://letsencrypt.org/docs/staging-environment/) |
 
 ## dex
 

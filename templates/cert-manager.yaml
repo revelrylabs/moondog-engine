@@ -20,15 +20,6 @@ spec:
   values:
     replicaCount: {{ .Values.certManager.replicaCount }}
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: ca-issuer-keypair
-  namespace: {{ .Values.certManager.namespace }}
-data:
-  tls.crt: {{ .Values.ca.crt | b64enc | quote }}
-  tls.key: {{ .Values.ca.key | b64enc | quote }}
----
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
@@ -60,14 +51,5 @@ spec:
       - http01:
           ingress:
             class: nginx
----
-apiVersion: cert-manager.io/v1alpha2
-kind: ClusterIssuer
-metadata:
-  name: ca-issuer
-  namespace: {{ .Values.certManager.namespace }}
-spec:
-  ca:
-    secretName: ca-issuer-keypair
 
 {{- end }}

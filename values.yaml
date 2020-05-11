@@ -106,15 +106,13 @@ aws:
 
 certManager:
   create: true
-  fake: false
   replicaCount: 1
   releaseName: md-cert-manager
   namespace: md-cert-manager
   # email: me@example.com
-  # The chart provides 3 ClusterIssuers:
+  # The chart provides 2 ClusterIssuers:
   #   * "letsencrypt" provisions production certs; this is the right choice for production deployment
   #   * "letsencrypt-staging" uses LetsEncrypt's staging server, which is good for testing and has generous rate limits
-  #   * "ca-issuer" is mostly just for development purposes; don't worry about it unless you're developing in minikube or similar.
   defaultClusterIssuer: letsencrypt
 
 dex:

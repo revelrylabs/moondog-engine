@@ -43,7 +43,7 @@ spec:
       type: external
       external:
         host: harbor-pg
-        username: {{ .Values.harbor.postgres.user }}
+        username: "postgres"
         password: {{ .Values.harbor.postgres.password | quote }}
     redis:
       type: external

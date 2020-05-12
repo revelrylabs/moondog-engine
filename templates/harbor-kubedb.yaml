@@ -72,7 +72,7 @@ metadata:
 type: Opaque
 data:
   POSTGRES_PASSWORD: {{ .Values.harbor.postgres.password | b64enc | quote }}
-  POSTGRES_USER: {{ .Values.harbor.postgres.user | b64enc | quote }}
+  POSTGRES_USER: {{ "postgres" | b64enc | quote }}
 
 {{- if $backupsEnabled }}
 ---

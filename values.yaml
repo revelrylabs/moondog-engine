@@ -154,8 +154,7 @@ harbor:
   releaseName: md-harbor
   namespace: md-harbor
   # adminPassword: "your admin password"
-  postgres:
-    user: md_harbor
+  postgres: {}
   dbBackups:
     enabled: true
     # bucketName: S3_BUCKET_NAME

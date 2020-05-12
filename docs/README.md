@@ -166,8 +166,7 @@ Configures the [`harbor`](https://github.com/goharbor/harbor-helm) chart.
 | `harbor.releaseName` | string (optional) | The release name for the HelmRelease |
 | `harbor.adminPassword` | string (optional; default random) | The initial password for Harbor's `admin` user. |
 | `harbor.secretKey` | string (optional, default random) | A 16-character secret key for encryption. |
-| `harbor.postgres.user` |  |  |
-| `harbor.postgres.password` |  |  |
+| `harbor.postgres.password` | string | Password for the `postgres` user in the Harbor database. |
 | `harbor.persistence.imageChartStorage` |  |  |
 | `harbor.dbBackups.enabled` | boolean (optional; default `true`) | Whether to enable DB backups. `true` requires the other backup options also. |
 | `harbor.dbBackups.bucketName` | string (optional) | Name of an S3 bucket to use for database backups. |

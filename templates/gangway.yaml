@@ -11,7 +11,7 @@ metadata:
   name: ca-crt
   namespace: {{ .Values.gangway.namespace }}
 data:
-  ca.crt: {{ .Values.ca.crt | quote }}
+  ca.crt: {{ .Values.pki.ca.crt | quote }}
 ---
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease

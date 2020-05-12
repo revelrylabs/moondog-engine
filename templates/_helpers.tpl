@@ -43,3 +43,31 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
+
+{{/*
+If input is given, check that it's 32 bytes in length
+If no input is given, generate 32 random bytes
+*/}}
+{{- define "moondog.random32" -}}
+{{- $value := default (randAlphaNum 32) . }}
+{{- $length := len $value }}
+{{- if eq $length 32 -}}
+{{ $value }}
+{{- else -}}
+{{- fail "Value must be exactly 32 bytes" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+If input is given, check that it's 16 bytes in length
+If no input is given, generate 16 random bytes
+*/}}
+{{- define "moondog.random16" -}}
+{{- $value := default (randAlphaNum 16) . }}
+{{- $length := len $value }}
+{{- if eq $length 16 -}}
+{{ $value }}
+{{- else -}}
+{{- fail "Value must be exactly 16 bytes" -}}
+{{- end -}}
+{{- end -}}

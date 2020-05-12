@@ -161,6 +161,7 @@ Configures the [`gangway`]() chart to allow users to authenticate via Dex to get
 | `gangway.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `gangway.namespace` | string (optional) | The namespace for the HelmRelease |
 | `gangway.releaseName` | string (optional) | The release name for the HelmRelease |
+| `gangway.sessionKey` | string (optional, default random) | A 32-character secret session key. |
 
 ## harbor
 
@@ -172,6 +173,7 @@ Configures the [`harbor`](https://github.com/goharbor/harbor-helm) chart.
 | `harbor.namespace` | string (optional) | The namespace for the HelmRelease |
 | `harbor.releaseName` | string (optional) | The release name for the HelmRelease |
 | `harbor.adminPassword` | string (optional; default random) | The initial password for Harbor's `admin` user. |
+| `harbor.secretKey` | string (optional, default random) | A 16-character secret key for encryption. |
 | `harbor.postgres.user` |  |  |
 | `harbor.postgres.password` |  |  |
 | `harbor.persistence.imageChartStorage` |  |  |
@@ -224,8 +226,9 @@ For typical Moondog Engine usage, you should only need to set `oauth.clientSecre
 | `oauth2Proxy.create` | boolean (optional; default `true`) | Whether to create this HelmRelease |
 | `oauth2Proxy.namespace` | string (optional) | The namespace for the HelmRelease |
 | `oauth2Proxy.releaseName` | string (optional) | The release name for the HelmRelease |
-| `oauth2Proxy.oauth.clientId` |  |  |
-| `oauth2Proxy.oauth.clientSecret` |  |  |
+| `oauth2Proxy.oauth.clientId` | string | The client id identifying the proxy to Dex. |
+| `oauth2Proxy.oauth.clientSecret` | string | The client secret to authenticate when connecting to Dex. |
+| `oauth2Proxy.oauth.cookieSecret` | string (optional, default random) | A 32-character secret key for generating cookies. |
 
 ## prometheusOperator
 

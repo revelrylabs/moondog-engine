@@ -91,9 +91,15 @@ Read any notes that are printed after successful installation, and follow any ad
 
 ## Post-install
 
-Some of the objects installed require DNS to work in order for them to start up and work correctly. After running the installer script, query your nginx service to discover the DNS address of your AWS Elastic Load Balancer (ELB) and add that as a wildcard for the domain, since this is where all of our web traffic will go. 
+Some of the objects installed require DNS to work in order for them to start up and work correctly. After running the installer script, query your nginx service to discover the DNS address of your AWS Elastic Load Balancer (ELB) and add that as a wildcard for the domain, since this is where all of our web traffic will go.
 
-Find the service with:
+If you're using AWS for your DNS and installed the nginx ingress controller using the default settings, this can be done by invoking the wildcard script with your cluster's base domain as an argument:
+
+```
+./bin/wildcard.sh my-cluster.example.com
+```
+
+Otherwise, to make the DNS entry manually, start by finding the service with:
 
 ```
 ❯❯❯ kubectl get svc -n md-nginx-ingress
@@ -115,10 +121,10 @@ To delete everything that Moondog Engine installed and start over:
 
 ## Troubleshooting
 
-Hopefully the installer will exit with a helpful error. If not, the line it exits on is going to be your best clue as to where to look to debug further. Ensure helmreleases are deployed correctly by running 
+Hopefully the installer will exit with a helpful error. If not, the line it exits on is going to be your best clue as to where to look to debug further. Ensure helmreleases are deployed correctly by running
 
-`helm list --all-namespaces` which should show `deployed` for all services. 
+`helm list --all-namespaces` which should show `deployed` for all services.
 
-If any of the components appear to be missing, you can describe the helmrelease to try to see what went wrong with its installation. Failing that, you can look at the logs of pods in the individual namespaces the installer creates for each helmrelease. 
+If any of the components appear to be missing, you can describe the helmrelease to try to see what went wrong with its installation. Failing that, you can look at the logs of pods in the individual namespaces the installer creates for each helmrelease.
 
 If all else fails, feel free to open an issue and we will try to help you!

@@ -22,7 +22,7 @@ done
 
 # store rendered template filenames in a variable. 
 # grep rendered templates, trim result to the format `$NAME --namespace $NAMESPACE` using awk. 
-HELMRELEASES=$(grep -A 3 HelmRelease tmp/moondog/templates/* | awk '/name:/{ NAME=$3; next} /namespace:/{ print NAME " --namespace "  $3  }')
+HELMRELEASES=$(grep -A 3 HelmRelease tmp/moondog/templates/**/* | awk '/name:/{ NAME=$3; next} /namespace:/{ print NAME " --namespace "  $3  }')
 
 # loop thru and delete the helmreleases
 for i in $HELMRELEASES
@@ -39,7 +39,7 @@ kubectl delete \
 
 # store rendered template filenames in a variable.
 # grep rendered templates, trim result to the format `$NAME --namespace $NAMESPACE` using awk and uniq
-NAMESPACES=$(grep -w -A 2 "kind: Namespace" tmp/moondog/templates/* | awk '/name:/{print $3}'| uniq)
+NAMESPACES=$(grep -w -A 2 "kind: Namespace" tmp/moondog/templates/**/* | awk '/name:/{print $3}'| uniq)
 for i in $NAMESPACES
 do if [ $i != "kube-system" ]
     then eval $(echo kubectl delete namespace $i)

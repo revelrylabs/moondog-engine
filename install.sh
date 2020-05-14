@@ -35,6 +35,15 @@ else
   setfile_arg=""
 fi
 
+# helper function for applying a pattern
+function applyall() {
+  for f in $@
+  do
+    echo "Applying template $f ..."
+    kubectl apply --wait -f $f
+  done
+}
+
 ### GENERATE THE TEMPLATE OUTPUTS
 
 # create tmp directory if it does not exist, and clear out files from previous runs
@@ -73,7 +82,7 @@ helm install md-helm-operator fluxcd/helm-operator \
 ### APPLY THE TEMPLATE OUTPUTS
 
 # first deploy kubedb because its needed for harbor to install properly
-kubectl apply -f tmp/moondog/templates/kubedb.yaml
+applyall tmp/moondog/templates/kubedb/*.yaml
 
 echo "waiting for kubedb and kubedb-catalog to be available..."
 
@@ -94,14 +103,7 @@ do
     sleep 5
 done
 
-# store rendered template filenames in a variable
-TEMPLATES=tmp/moondog/templates/*.yaml
-
 # apply all rendered templates
-for f in $TEMPLATES
-do
-  echo "Processing $f template..."
-  kubectl apply --wait -f $f
-done
+applyall tmp/moondog/templates/**/*.yaml
 
 echo "Install is complete!"

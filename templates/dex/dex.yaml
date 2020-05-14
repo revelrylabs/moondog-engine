@@ -1,13 +1,4 @@
 {{- if .Values.dex.create }}
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.dex.namespace }}
----
-
-{{ $redirectURI := printf "https://dex.%s/callback" .Values.domainSuffix }}
-
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -20,6 +11,9 @@ spec:
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: dex
     version: 2.10.0
+  valuesFrom:
+    - secretKeyRef:
+        name: values-yaml
   values:
     grpc: false
     ports:
@@ -29,58 +23,6 @@ spec:
     config:
       issuer: https://dex.{{ .Values.domainSuffix }}
       enablePasswordDB: false
-      connectors:
-        {{- range .Values.auth }}
-        - type: {{ .type | quote }}
-          id: {{ .id | quote }}
-          name: {{ .name | quote }}
-          config:
-            {{- with .oauth }}
-            clientID: {{ .clientId | quote }}
-            clientSecret: {{ .clientSecret | quote }}
-            {{- end }}
-            redirectURI: {{ $redirectURI | quote }}
-            {{- if eq .type "github" }}
-            {{- with .orgs }}
-            orgs:
-              {{- range . }}
-              - name: {{ .name | quote }}
-                {{- with .teams }}
-                teams:
-                  {{- range . }}
-                  - {{ .name | quote }}
-                  {{- end }}
-                {{- end }}
-              {{- end }}
-            {{- end }}
-            {{/* TODO: {{- else if eq .type "google" }} etc. */}}
-            {{- end }}
-        {{- end }}
-      staticClients:
-        - id: {{ .Values.dex.oauth.clientId | quote }}
-          name: {{ .Values.dex.oauth.clientId | quote }}
-          secret: {{ .Values.dex.oauth.clientSecret | quote }}
-          redirectURIs:
-          - https://gangway.{{ .Values.domainSuffix }}/callback
-          trustedPeers:
-            - {{ .Values.navigator.oauth.clientId | quote }}
-            - {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
-            - {{ .Values.oauth2Proxy.oauth.clientId | quote }}
-        - id: {{ .Values.navigator.oauth.clientId | quote }}
-          name: {{ .Values.navigator.oauth.clientId | quote }}
-          secret: {{ .Values.navigator.oauth.clientSecret | quote }}
-          redirectURIs:
-            - https://navigator.{{ .Values.domainSuffix }}/kubernetes/auth/callback
-        - id: {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
-          name: {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
-          secret: {{ .Values.prometheusOperator.grafana.oauth.clientSecret | quote }}
-          redirectURIs:
-            - https://grafana.{{ .Values.domainSuffix }}/login/generic_oauth
-        - id: {{ .Values.oauth2Proxy.oauth.clientId | quote }}
-          name: {{ .Values.oauth2Proxy.oauth.clientId | quote }}
-          secret: {{ .Values.oauth2Proxy.oauth.clientSecret | quote }}
-          redirectURIs:
-            - https://oauth2-proxy.{{ .Values.domainSuffix }}/oauth2/callback
     ingress:
       enabled: true
       annotations:
@@ -92,5 +34,4 @@ spec:
         - secretName: dex-tls
           hosts:
             - dex.{{ .Values.domainSuffix }}
-
 {{- end }}

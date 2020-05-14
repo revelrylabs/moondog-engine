@@ -1,18 +1,4 @@
 {{- if .Values.flux.create }}
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.flux.namespace }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Values.flux.envSecretName }}
-  namespace: {{ .Values.flux.namespace }}
-data:
-  identity: {{ .Values.flux.git.auth.key }}
----
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -30,5 +16,4 @@ spec:
       url: {{ .Values.flux.git.repo | quote }}
       branch: {{ .Values.flux.git.branch }}
       secretName: {{ .Values.flux.envSecretName }}
-
 {{- end }}

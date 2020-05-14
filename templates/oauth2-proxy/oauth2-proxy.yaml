@@ -1,10 +1,4 @@
 {{- if .Values.oauth2Proxy.create }}
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.oauth2Proxy.namespace }}
----
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -16,11 +10,12 @@ spec:
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: oauth2-proxy
     version: 2.1.1
+  valuesFrom:
+    - secretKeyRef:
+        name: values-yaml
   values:
     config:
       clientID: {{ .Values.oauth2Proxy.oauth.clientId | quote }}
-      clientSecret: {{ .Values.oauth2Proxy.oauth.clientSecret | quote }}
-      cookieSecret: {{ include "moondog.random32" .Values.oauth2Proxy.oauth.cookieSecret | b64enc | quote }}
     extraArgs:
       cookie-domain: .{{ .Values.domainSuffix }}
       whitelist-domain: .{{ .Values.domainSuffix }}
@@ -39,5 +34,4 @@ spec:
         - secretName: oauth2-proxy-tls
           hosts:
             - oauth2-proxy.{{ .Values.domainSuffix }}
-
 {{- end }}

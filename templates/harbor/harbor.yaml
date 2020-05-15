@@ -1,10 +1,5 @@
 {{- if .Values.harbor.create }}
 
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.harbor.namespace }}
----
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:

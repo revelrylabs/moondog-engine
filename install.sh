@@ -81,25 +81,39 @@ helm install md-helm-operator fluxcd/helm-operator \
 
 ### APPLY THE TEMPLATE OUTPUTS
 
-# first deploy kubedb because its needed for harbor to install properly
+# deploy sealed-secrets first so we can seal all our secrets
+applyall tmp/moondog/templates/sealed-secrets/*.yaml
+while [ "$(kubectl get helmrelease -n kube-system -o=jsonpath='{.items[?(@.status.releaseStatus=="deployed")].metadata.name}')" != "sealed-secrets-controller" ]
+do
+  echo "Waiting for sealed-secrets controller to be available..."
+  sleep 5
+done
+
+# seal all our secrets
+for f in tmp/moondog/templates/**/*.secret.yaml
+do
+  echo "Sealing secret $f ..."
+  tempfile=/tmp/seal-me-next.yaml
+  cat $f \
+    | kubeseal -o yaml \
+    > $tempfile \
+    && cp $tempfile $f \
+    && rm $tempfile
+done
+
+# deploy kubedb because its needed for harbor to install properly
 applyall tmp/moondog/templates/kubedb/*.yaml
-
-echo "waiting for kubedb and kubedb-catalog to be available..."
-
 # this wait loops until both kubedb and kubedb-catalog helmreleases are `deployed`
 # use jsonpath here as some `--field-selectors` are not aviailable for CRDs
 while [ "$(kubectl get helmrelease -n md-kubedb -o=jsonpath='{.items[?(@.status.releaseStatus=="deployed")].metadata.name}')" != "kubedb kubedb-catalog" ]
 do
-    echo ...
+    echo "Waiting for kubedb and kubedb-catalog to be available..."
     sleep 5
 done
-
-echo "ensuring kubedb CRDs exist..."
-
 # ensure postgres crd exists
 until kubectl get crd postgreses.kubedb.com
 do
-    echo ...
+    echo "Waiting for Postgres CRD to exist..."
     sleep 5
 done
 

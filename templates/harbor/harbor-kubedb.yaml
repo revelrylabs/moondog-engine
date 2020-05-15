@@ -1,4 +1,7 @@
 {{- if and .Values.harbor.create .Values.kubedb.create }}
+
+{{- $backupsEnabled := .Values.harbor.dbBackups.enabled }}
+
 apiVersion: kubedb.com/v1alpha1
 kind: Postgres
 metadata:
@@ -23,7 +26,7 @@ spec:
     scriptSource:
       configMap:
         name: harbor-init-sql
-  {{- if .Values.harbor.dbBackups.enabled }}
+  {{- if $backupsEnabled }}
   backupSchedule:
     cronExpression: "@every 30m"
     storageSecretName: s3-credentials
@@ -53,4 +56,45 @@ spec:
   updateStrategy:
     type: RollingUpdate
   terminationPolicy: Pause
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: harbor-db-auth
+  namespace: {{ .Values.harbor.namespace }}
+type: Opaque
+data:
+  POSTGRES_PASSWORD: {{ .Values.harbor.postgres.password | b64enc | quote }}
+  POSTGRES_USER: {{ "postgres" | b64enc | quote }}
+
+{{- if $backupsEnabled }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: s3-credentials
+  namespace: {{ .Values.harbor.namespace }}
+type: Opaque
+data:
+  {{- with .Values.harbor.dbBackups.credentials }}
+  AWS_ACCESS_KEY_ID: {{ .accessKeyId | b64enc | quote }}
+  AWS_SECRET_ACCESS_KEY: {{ .secretAccessKey | b64enc | quote }}
+  {{- end }}
+{{- end }}
+
+---
+apiVersion: v1
+data:
+  harbor.sql: |
+    CREATE DATABASE registry;
+    CREATE DATABASE harbor;
+    CREATE DATABASE core;
+    CREATE DATABASE clair;
+    CREATE DATABASE notary_server;
+    CREATE DATABASE notary_signer;
+kind: ConfigMap
+metadata:
+  name: harbor-init-sql
+  namespace: {{ .Values.harbor.namespace }}
 {{- end }}

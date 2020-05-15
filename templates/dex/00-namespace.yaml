@@ -1,0 +1,6 @@
+{{- if .Values.dex.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.dex.namespace }}
+{{- end }}

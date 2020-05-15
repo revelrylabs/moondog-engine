@@ -1,20 +1,4 @@
 {{- if .Values.prometheusOperator.create }}
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.prometheusOperator.namespace }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: etcd-client
-  namespace: {{ .Values.prometheusOperator.namespace }}
-data:
-  ca.crt: {{ .Values.pki.etcd.ca.crt | b64enc |  quote }}
-  healthcheck-client.key: {{ .Values.pki.etcd.healthcheckClient.key | b64enc | quote }}
-  healthcheck-client.crt: {{ .Values.pki.etcd.healthcheckClient.crt | b64enc | quote }}
----
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -27,13 +11,15 @@ spec:
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: prometheus-operator
     version: 8.12.13
+  valuesFrom:
+    - secretKeyRef:
+        name: values-yaml
   values:
     prometheusOperator:
       createCustomResource: false # https://github.com/helm/charts/tree/master/stable/prometheus-operator#helm-fails-to-create-crds
     grafana:
       rbac:
         pspUseAppArmor: false
-      adminPassword: {{ .Values.prometheusOperator.grafana.adminPassword | quote }}
       grafana.ini:
         log:
           level: debug
@@ -43,7 +29,6 @@ spec:
         auth.generic_oauth:
           enabled: true
           client_id: {{ .Values.prometheusOperator.grafana.oauth.clientId | quote }}
-          client_secret: {{ .Values.prometheusOperator.grafana.oauth.clientSecret | quote }}
           scopes: {{ printf "%s audience:server:client_id:%s" .Values.prometheusOperator.grafana.oauth.scopes .Values.dex.oauth.clientId | quote}}
           auth_url: https://dex.{{ .Values.domainSuffix }}/auth
           token_url: http://{{ .Values.dex.releaseName }}.{{ .Values.dex.namespace }}.svc:32000/token
@@ -126,5 +111,4 @@ spec:
         caFile: /etc/prometheus/secrets/etcd-client/ca.crt
         certFile: /etc/prometheus/secrets/etcd-client/healthcheck-client.crt
         keyFile: /etc/prometheus/secrets/etcd-client/healthcheck-client.key
-
 {{- end }}

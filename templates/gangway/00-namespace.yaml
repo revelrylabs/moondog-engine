@@ -1,0 +1,6 @@
+{{- if .Values.gangway.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.gangway.namespace }}
+{{- end }}

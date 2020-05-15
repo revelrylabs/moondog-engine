@@ -1,18 +1,4 @@
 {{- if .Values.gangway.create }}
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .Values.gangway.namespace }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ca-crt
-  namespace: {{ .Values.gangway.namespace }}
-data:
-  ca.crt: {{ .Values.pki.ca.crt | quote }}
----
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
@@ -25,6 +11,9 @@ spec:
     repository: https://kubernetes-charts.storage.googleapis.com/
     name: gangway
     version: 0.4.0
+  valuesFrom:
+    - secretKeyRef:
+        name: values-yaml
   values:
     extraVolumes:
       - name: ca-crt
@@ -38,8 +27,6 @@ spec:
       apiServerURL: {{ .Values.apiServerUrl | quote }}
       clusterName: {{ .Values.clusterName }}
       clientID: {{ .Values.dex.oauth.clientId | quote }}
-      clientSecret: {{ .Values.dex.oauth.clientSecret | quote }}
-      sessionKey: {{ include "moondog.random32" .Values.gangway.sessionKey | b64enc | quote }}
       authorizeURL: https://dex.{{ .Values.domainSuffix }}/auth
       tokenURL: https://dex.{{ .Values.domainSuffix }}/token
       audience: https://dex.{{ .Values.domainSuffix }}/userinfo
@@ -62,5 +49,4 @@ spec:
         - secretName: gangway-tls
           hosts:
             - gangway.{{ .Values.domainSuffix }}
-
 {{- end }}

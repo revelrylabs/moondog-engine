@@ -1,0 +1,17 @@
+{{- if .Values.harbor.create }}
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: harbor-redis
+  namespace: {{ .Values.harbor.namespace }}
+spec:
+  timeout: {{ .Values.helmReleaseTimeout }}
+  releaseName: {{ .Values.harbor.releaseName }}-redis
+  chart:
+    repository: https://dandydeveloper.github.io/charts
+    name: redis-ha
+    version: 4.5.3
+  values:
+    haproxy:
+      enabled: true
+{{- end }}

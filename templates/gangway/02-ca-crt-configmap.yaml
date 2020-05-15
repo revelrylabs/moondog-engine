@@ -1,0 +1,9 @@
+{{- if .Values.gangway.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ca-crt
+  namespace: {{ .Values.gangway.namespace }}
+data:
+  ca.crt: {{ .Values.pki.ca.crt | quote }}
+{{- end }}

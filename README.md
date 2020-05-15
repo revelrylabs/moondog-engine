@@ -27,6 +27,10 @@ If you're reading this, you almost certainly have `kubectl` already, but in case
 
 Install Helm if you do not already have it: https://helm.sh/docs/intro/install/
 
+### kubeseal
+
+Install `kubeseal` if you do not already have it: https://github.com/bitnami-labs/sealed-secrets#homebrew
+
 ### Amazon S3
 
 * [Create an Amazon S3 bucket](https://docs.aws.amazon.com/quickstarts/latest/s3backup/step-1-create-bucket.html) that Moondog Engine apps will use for storing backups of Kubernetes resources and volumes.

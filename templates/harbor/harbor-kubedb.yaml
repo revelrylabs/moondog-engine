@@ -2,6 +2,12 @@
 
 {{- $backupsEnabled := .Values.harbor.dbBackups.enabled }}
 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.harbor.namespace }}
+
+---
 apiVersion: kubedb.com/v1alpha1
 kind: Postgres
 metadata:

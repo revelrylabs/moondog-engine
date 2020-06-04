@@ -18,7 +18,7 @@ spec:
       - ReadWriteOnce
     resources:
       requests:
-        storage: 1G
+        storage: 10G
   init:
     scriptSource:
       configMap:

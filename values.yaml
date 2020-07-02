@@ -123,6 +123,12 @@ certManager:
   #   * "letsencrypt" provisions production certs; this is the right choice for production deployment
   #   * "letsencrypt-staging" uses LetsEncrypt's staging server, which is good for testing and has generous rate limits
   defaultClusterIssuer: letsencrypt
+  dns:
+    route53:
+      create: true
+      # accessKeyId: AWS_ACCESS_KEY_ID
+      # accessKeySecret: AWS_SECRET_ACCESS_KEY
+      # hostedZone: domainSuffix
 
 dex:
   create: true

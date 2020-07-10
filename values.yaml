@@ -128,7 +128,6 @@ certManager:
       create: true
       # accessKeyId: AWS_ACCESS_KEY_ID
       # accessKeySecret: AWS_SECRET_ACCESS_KEY
-      # hostedZone: domainSuffix
 
 dex:
   create: true

@@ -51,6 +51,7 @@ spec:
       - http01:
           ingress:
             class: nginx
+{{- if .Values.certManager.dns.route53.create }}
 ---
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
@@ -62,24 +63,22 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     email: {{ .Values.certManager.email | quote }}
     privateKeySecretRef:
-      name: letsencrypt-staging
+      name: letsencrypt
     solvers:
       - selector:
           dnsZones:
             - {{ .Values.domainSuffix }}
         dns01:
-          {{- if .Values.certManager.dns.route53.create }}
           route53:
             accessKeyID: {{ .Values.certManager.dns.route53.accessKeyId }}
             secretAccessKeySecretRef:
               name: dns-route53-credentials
               key: AWS_SECRET_ACCESS_KEY
-          {{- end}}
 ---
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-dns
+  name: letsencrypt-dns-staging
   namespace: {{ .Values.certManager.namespace }}
 spec:
   acme:
@@ -92,11 +91,10 @@ spec:
           dnsZones:
             - {{ .Values.domainSuffix }}
         dns01:
-          {{- if .Values.certManager.dns.route53.create }}
           route53:
             accessKeyID: {{ .Values.certManager.dns.route53.accessKeyId }}
             secretAccessKeySecretRef:
               name: dns-route53-credentials
               key: AWS_SECRET_ACCESS_KEY
-          {{- end}}
+{{- end }}
 {{- end }}

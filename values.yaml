@@ -119,10 +119,17 @@ certManager:
   releaseName: md-cert-manager
   namespace: md-cert-manager
   # email: me@example.com
-  # The chart provides 2 ClusterIssuers:
+  # The chart provides 2 or 4 ClusterIssuers:
   #   * "letsencrypt" provisions production certs; this is the right choice for production deployment
   #   * "letsencrypt-staging" uses LetsEncrypt's staging server, which is good for testing and has generous rate limits
+  #   * "letsencrypt-dns" provisions production certs; this should only be used when request challenges via DNS is required
+  #   * "letsencrypt-dns-staging" uses LetsEncrypt's staging server
   defaultClusterIssuer: letsencrypt
+  dns:
+    route53:
+      create: true
+      # accessKeyId: AWS_ACCESS_KEY_ID
+      # accessKeySecret: AWS_SECRET_ACCESS_KEY
 
 dex:
   create: true

@@ -25,7 +25,7 @@ spec:
         name: harbor-init-sql
   {{- if .Values.harbor.dbBackups.enabled }}
   backupSchedule:
-    cronExpression: "@every 30m"
+    cronExpression: "@every 2h"
     storageSecretName: s3-credentials
     s3:
       endpoint: "s3.amazonaws.com"

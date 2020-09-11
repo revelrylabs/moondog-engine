@@ -70,6 +70,7 @@ spec:
             - {{ .Values.domainSuffix }}
         dns01:
           route53:
+            region: {{ .Values.certManager.dns.route53.region }}
             accessKeyID: {{ .Values.certManager.dns.route53.accessKeyId }}
             secretAccessKeySecretRef:
               name: dns-route53-credentials
@@ -92,6 +93,7 @@ spec:
             - {{ .Values.domainSuffix }}
         dns01:
           route53:
+            region: {{ .Values.certManager.dns.route53.region }}
             accessKeyID: {{ .Values.certManager.dns.route53.accessKeyId }}
             secretAccessKeySecretRef:
               name: dns-route53-credentials

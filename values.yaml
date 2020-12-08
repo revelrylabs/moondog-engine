@@ -17,6 +17,7 @@ pki:
 
 userPermissions:
   namespace: md-user-permissions
+  releaseName: md-user-permissions
   roleDefinitions:
     md-read-write-all:
       - apiGroups:

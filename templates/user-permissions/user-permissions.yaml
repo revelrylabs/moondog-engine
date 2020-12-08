@@ -37,7 +37,7 @@ metadata:
   namespace: {{ .Values.userPermissions.namespace | quote }}
 spec:
   timeout: {{ .Values.helmReleaseTimeout }}
-  releaseName: {{ .Values.certManager.releaseName }}
+  releaseName: {{ .Values.userPermissions.releaseName | quote }}
   chart:
     repository: https://revelrylabs.github.io/helm-charts
     name: user-permissions
